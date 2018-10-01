@@ -32,6 +32,13 @@
         <module>util</module>
     </modules>
 
+    <distributionManagement>
+        <repository>
+            <id>bintray-guanaco-io-alerta</id>
+            <url>https://api.bintray.com/maven/guanaco-io/alerta/alerta/;publish=1</url>
+        </repository>
+    </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
