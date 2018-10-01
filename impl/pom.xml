@@ -92,4 +92,11 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>bintray-guanaco-io-alerta</id>
+            <url>https://api.bintray.com/maven/guanaco-io/alerta/impl/;publish=1</url>
+        </repository>
+    </distributionManagement>
+
 </project>
