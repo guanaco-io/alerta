@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0">
+
+
+    <cm:property-placeholder persistent-id="be.guanaco.smx.alerta" update-strategy="reload">
+        <cm:default-properties>
+            <cm:property name="apiUrl" value="http://localhost:8282/api"/>
+            <cm:property name="environment" value="Development" />
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean id="routes" class="be.guanaco.smx.alerta.impl.AlertaRoutes">
+        <argument value="${apiUrl}"/>
+        <argument value="${environment}"/>
+    </bean>
+
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="failover:(tcp://localhost:61616)"/>
+        <property name="userName" value="smx"/>
+        <property name="password" value="smx"/>
+    </bean>
+
+    <camelContext xmlns="http://camel.apache.org/schema/blueprint" id="alerta" useMDCLogging="true">
+        <routeBuilder ref="routes"/>
+    </camelContext>
+
+    <service interface="be.guanaco.smx.alerta.api.Alerta">
+        <bean class="be.guanaco.smx.alerta.impl.AlertaImpl">
+            <argument ref="alerta"/>
+        </bean>
+    </service>
+
+</blueprint>
