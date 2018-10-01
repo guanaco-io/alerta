@@ -24,6 +24,8 @@ environment = Development
 
 ## Getting Started
 
+First, [setup up a maven profile for the bintray repositories](https://github.com/guanaco-io/alerta/wiki/Setup-Maven-profile)
+
 Add the guanaco-io/alerta dependency to your project.
 eg using maven:
 ```xml
