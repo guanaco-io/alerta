@@ -31,6 +31,7 @@
         <module>api</module>
         <module>impl</module>
         <module>util</module>
+        <module>features</module>
     </modules>
 
     <dependencyManagement>

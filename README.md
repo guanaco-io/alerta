@@ -1,10 +1,10 @@
 # Alerta
 
-ServiceMix bundles adding error handling with [Alerta](https://alerta.io/)
+Camel OSGI bundles adding error handling with [Alerta](https://alerta.io/)
 
 
 ## Installation
-(Tested with ServiceMix version 7.0.0.M2 )
+(Tested in OSGI container ServiceMix version 7.0.0.M2 )
 
 first, start an Alerta instance:
 to set up a local Alerta instance with docker-compose, follow [this guideline](https://github.com/guanaco-io/alerta/wiki/Bootstrap-a-local-Alerta-instance-with-docker-compose)
@@ -12,8 +12,8 @@ to set up a local Alerta instance with docker-compose, follow [this guideline](h
 install and start the bundles in your karaf console:
 ```
 ./bin/servicemix
-> bundle:install mvn:io.guanaco.alerta/api_2.11/1.0.1-SNAPSHOT</bundle>
-> bundle:install mvn:io.guanaco.alerta/impl_2.11/1.0.1-SNAPSHOT</bundle>
+> feature:repo-add mvn:io.guanaco.alerta/features/1.0.1-SNAPSHOT/xml/features
+> feature:install guanaco-alerta
 ```
 
 add a io.guanaco.alerta.cfg file in <smx_install>/etc with your Alerta settings:
