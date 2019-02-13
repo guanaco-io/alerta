@@ -8,8 +8,8 @@
     <version>1.0.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <name>Alerta</name>
-    <description>Parent POM for all Alerta bundles</description>
+    <name>Guanaco :: Alerta</name>
+    <description>Parent POM for Guanaco Alerta bundles</description>
 
     <scm>
         <url>https://github.com/guanaco-io/alerta</url>

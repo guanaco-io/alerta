@@ -14,7 +14,7 @@
     <artifactId>impl</artifactId>
 
     <packaging>bundle</packaging>
-    <name>Alerta :: Implementation</name>
+    <name>Guanaco :: Alerta :: Implementation</name>
 
     <properties>
         <commons-io.version>2.4</commons-io.version>

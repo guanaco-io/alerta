@@ -14,7 +14,7 @@
     <artifactId>api</artifactId>
 
     <packaging>bundle</packaging>
-    <name>Alerta :: API</name>
+    <name>Guanaco :: Alerta :: API</name>
 
     <dependencies>
         <dependency>
