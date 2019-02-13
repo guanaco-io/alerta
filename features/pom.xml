@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.guanaco</groupId>
         <artifactId>alerta</artifactId>
-        <version>1.0.x-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <groupId>io.guanaco.alerta</groupId>
