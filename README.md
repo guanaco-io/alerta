@@ -16,7 +16,7 @@ install and start the bundles in your karaf console:
 > feature:install guanaco-alerta
 ```
 
-add a io.guanaco.alerta.cfg file in <smx_install>/etc with your Alerta settings:
+add a `io.guanaco.alerta.cfg` file in <karaf_install>/etc with your Alerta settings:
 ```ini
 apiUrl = http://localhost:8282/api
 environment = Development
@@ -46,6 +46,16 @@ eg using maven:
     <groupId>io.guanaco.alerta</groupId>
     <artifactId>util_2.12</artifactId>
     <version>2.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+Optionally, for unit testing, include
+```xml
+<dependency>
+    <groupId>io.guanaco.alerta</groupId>
+    <artifactId>test_2.12</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
+    <scope>test</scope>
 </dependency>
 ```
 
@@ -90,7 +100,7 @@ because we also send a success alert, this snippet can be repeated and previousl
 
 
 to add error handling support in your camel RouteBuilder
-for more examples see [AlertaRouteBuilderSupportTest](https://github.com/guanaco-io/alerta/blob/master/util/src/test/scala/io/guanaco/alerta/util/AlertaRouteBuilderSupportTest.scala))
+(for more examples see [AlertaRouteBuilderSupportTest](https://github.com/guanaco-io/alerta/blob/master/util/src/test/scala/io/guanaco/alerta/util/AlertaRouteBuilderSupportTest.scala))
 ```scala
 
 import io.guanaco.alerta.util.{AlertaConfig, AlertaRouteBuilderSupport}
