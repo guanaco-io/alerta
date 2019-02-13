@@ -23,12 +23,11 @@
     <parent>
         <groupId>io.guanaco</groupId>
         <artifactId>alerta</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>2.0.x-SNAPSHOT</version>
     </parent>
 
     <groupId>io.guanaco.alerta</groupId>
     <artifactId>features</artifactId>
-    <version>2.0.1</version>
     <packaging>pom</packaging>
     <name>Guanaco :: Alerta :: Features</name>
 
