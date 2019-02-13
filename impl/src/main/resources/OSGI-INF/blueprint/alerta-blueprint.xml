@@ -7,6 +7,9 @@
         <cm:default-properties>
             <cm:property name="apiUrl" value="http://localhost:8282/api"/>
             <cm:property name="environment" value="Development" />
+            <cm:property name="brokerURL" value="failover:(tcp://localhost:61616)"/>
+            <cm:property name="userName" value="karaf"/>
+            <cm:property name="password" value="karaf"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -16,9 +19,9 @@
     </bean>
 
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-        <property name="brokerURL" value="failover:(tcp://localhost:61616)"/>
-        <property name="userName" value="smx"/>
-        <property name="password" value="smx"/>
+        <property name="brokerURL" value="${brokerURL}"/>
+        <property name="userName" value="${userName}"/>
+        <property name="password" value="${password}"/>
     </bean>
 
     <camelContext xmlns="http://camel.apache.org/schema/blueprint" id="alerta" useMDCLogging="true">

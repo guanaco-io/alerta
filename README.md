@@ -20,6 +20,9 @@ add a io.guanaco.alerta.cfg file in <smx_install>/etc with your Alerta settings:
 ```ini
 apiUrl = http://localhost:8282/api
 environment = Development
+brokerURL = failover:(tcp://localhost:61616)
+userName = karaf
+password = karaf
 ```
 
 ## Getting Started
