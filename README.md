@@ -12,7 +12,7 @@ to set up a local Alerta instance with docker-compose, follow [this guideline](h
 install and start the bundles in your karaf console:
 ```
 ./bin/karaf
-> feature:repo-add mvn:io.guanaco.alerta/features/1.0.1-SNAPSHOT/xml/features
+> feature:repo-add mvn:io.guanaco.alerta/features/2.0.1-SNAPSHOT/xml/features
 > feature:install guanaco-alerta
 ```
 
@@ -36,13 +36,13 @@ eg using maven:
 
 <dependency>
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>api_2.11</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <artifactId>api_2.12</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
 </dependency>
 <dependency>
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>util_2.11</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <artifactId>util_2.12</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
