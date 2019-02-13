@@ -31,10 +31,6 @@
     <packaging>pom</packaging>
     <name>Guanaco :: Alerta :: Features</name>
 
-    <properties>
-        <activemq.version>5.13.3</activemq.version>
-    </properties>
-
     <build>
         <resources>
             <resource>

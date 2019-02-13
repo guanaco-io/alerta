@@ -4,15 +4,14 @@ import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.api.Heartbeat
 import org.apache.commons.io.IOUtils
 import org.junit.Test
-import org.junit.Assert._
+import org.skyscreamer.jsonassert.JSONAssert
+import spray.json._
+import AlertaJsonProtocol._
 
 /**
   * Test cases for [[AlertaJsonProtocol]]
   */
 class AlertaJsonProtocolTest {
-
-  import spray.json._
-  import AlertaJsonProtocol._
 
   @Test
   def testSprayHeartbeat(): Unit = {
@@ -20,7 +19,8 @@ class AlertaJsonProtocolTest {
 
     val result = heartbeat.toJson.compactPrint
     val expected = readExpected("heartbeat.json")
-    assertEquals(expected, result)
+
+    JSONAssert.assertEquals(expected, result, false)
   }
 
   @Test
@@ -35,7 +35,8 @@ class AlertaJsonProtocolTest {
 
     val result = alert.toJson.compactPrint
     val expected = readExpected("alert.json")
-    assertEquals(expected, result)
+
+    JSONAssert.assertEquals(expected, result, false)
   }
 
   def readExpected(name: String): String =

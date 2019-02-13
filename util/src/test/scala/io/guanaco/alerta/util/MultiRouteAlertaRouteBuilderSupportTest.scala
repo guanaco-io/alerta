@@ -3,7 +3,7 @@ package io.guanaco.alerta.util
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.impl.AlertaImpl
 import org.apache.activemq.camel.component.ActiveMQComponent
-import org.apache.camel.CamelContext
+import org.apache.camel.{CamelContext, RoutesBuilder}
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.impl.JndiRegistry
 import org.apache.camel.test.junit4.CamelTestSupport
@@ -45,9 +45,8 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
     assertTrue(correlated.exists(_.endsWith("Failure")))
   }
 
-  override def createRouteBuilders(): Array[RouteBuilder] = Array(
+  override def createRouteBuilders(): Array[RoutesBuilder] = Array(
     createAlertaRouteBuilder(),
-
     new RouteBuilder() with AlertaRouteBuilderSupport {
       implicit val config = AlertaConfig(AlertaFlowId, Seq("service")) { value: String =>
         s"${AlertaFlowId}:${value}"

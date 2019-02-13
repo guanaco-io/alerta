@@ -1,14 +1,17 @@
 package io.guanaco.alerta.impl
 
 import io.guanaco.alerta.api.{Alert, Alerta, Heartbeat}
-import AlertaImpl.getEndpoint
-import org.apache.camel.Exchange
+import io.guanaco.alerta.impl.AlertaImpl.getEndpoint
+import io.guanaco.alerta.impl.AlertaJsonProtocol._
+import org.apache.camel.{Exchange, RoutesBuilder}
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.test.AvailablePortFinder
 import org.junit.Assert._
 import org.junit.Test
+import org.skyscreamer.jsonassert.JSONAssert
 import spray.json._
-import AlertaJsonProtocol._
+
+import scala.collection.JavaConverters._
 
 /**
   * Test cases for [[AlertaRoutes]]
@@ -21,6 +24,7 @@ object AlertaRoutesTest {
 }
 
 class AlertaRoutesTest extends AbstractAlertaTest {
+
   @Test
   @throws[InterruptedException]
   def testSendAlert(): Unit = {
@@ -30,9 +34,11 @@ class AlertaRoutesTest extends AbstractAlertaTest {
     val alert = Alert("resource", "event", Array("tag1"))
     sendBody(getEndpoint(Alerta.ALERT_QUEUE_NAME), alert.toJson.compactPrint)
     assertMockEndpointsSatisfied()
-    import scala.collection.JavaConversions._
-    for (exchange <- mock.getExchanges) {
-      assertEquals("{\"event\":\"event\",\"service\":[\"tag1\"],\"resource\":\"resource\",\"environment\":\"Production\",\"severity\":\"minor\",\"timeout\":604800}", exchange.getIn.getBody(classOf[String]))
+
+    for (exchange <- mock.getExchanges.asScala) {
+      val expected = "{\"event\":\"event\",\"service\":[\"tag1\"],\"resource\":\"resource\",\"environment\":\"Production\",\"severity\":\"minor\",\"timeout\":604800}"
+
+      JSONAssert.assertEquals(expected, exchange.getIn.getBody(classOf[String]), false)
       assertEquals("application/json", exchange.getIn.getHeader(Exchange.CONTENT_TYPE))
     }
   }
@@ -46,26 +52,32 @@ class AlertaRoutesTest extends AbstractAlertaTest {
     val heartbeat = Heartbeat("origin", Array("tag1"), 100)
     sendBody(getEndpoint(Alerta.HEARTBEAT_QUEUE_NAME), heartbeat.toJson.compactPrint)
     assertMockEndpointsSatisfied()
-    import scala.collection.JavaConversions._
-    for (exchange <- mock.getExchanges) {
-      assertEquals("{\"origin\":\"origin\",\"tags\":[\"tag1\"],\"timeout\":100}", exchange.getIn.getBody(classOf[String]))
+
+    for (exchange <- mock.getExchanges.asScala) {
+      val expected = "{\"origin\":\"origin\",\"tags\":[\"tag1\"],\"timeout\":100}"
+
+      JSONAssert.assertEquals(expected, exchange.getIn.getBody(classOf[String]), false)
       assertEquals("application/json", exchange.getIn.getHeader(Exchange.CONTENT_TYPE))
     }
   }
 
   @throws[Exception]
-  override protected def createRouteBuilders: Array[RouteBuilder] = Array[RouteBuilder](new AlertaRoutes(AlertaRoutesTest.HTTP_URL, "Production"), new RouteBuilder() {
-    @throws[Exception]
-    override def configure(): Unit = {
-      //FORMAT:off
-      from(String.format("jetty:%s/alert", AlertaRoutesTest.HTTP_URL))
-        .convertBodyTo(classOf[String])
-        .to(AlertaRoutesTest.MOCK_ALERTS)
+  override protected def createRouteBuilders: Array[RoutesBuilder] = Array(
+    new AlertaRoutes(AlertaRoutesTest.HTTP_URL, "Production"),
+    new RouteBuilder() {
+      @throws[Exception]
+      override def configure(): Unit = {
+        //FORMAT:off
+        from(String.format("jetty:%s/alert", AlertaRoutesTest.HTTP_URL))
+          .convertBodyTo(classOf[String])
+          .to(AlertaRoutesTest.MOCK_ALERTS)
 
-      from(String.format("jetty:%s/heartbeat", AlertaRoutesTest.HTTP_URL))
-        .convertBodyTo(classOf[String])
-        .to(AlertaRoutesTest.MOCK_HEARTBEATS)
-      //FORMAT:on
+        from(String.format("jetty:%s/heartbeat", AlertaRoutesTest.HTTP_URL))
+          .convertBodyTo(classOf[String])
+          .to(AlertaRoutesTest.MOCK_HEARTBEATS)
+        //FORMAT:on
+      }
     }
-  })
+  )
+
 }

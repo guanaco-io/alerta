@@ -4,14 +4,14 @@ Camel OSGI bundles adding error handling with [Alerta](https://alerta.io/)
 
 
 ## Installation
-(Tested in OSGI container ServiceMix version 7.0.0.M2 )
+(Tested in OSGI container Karaf version 4.2.1 )
 
 first, start an Alerta instance:
 to set up a local Alerta instance with docker-compose, follow [this guideline](https://github.com/guanaco-io/alerta/wiki/Bootstrap-a-local-Alerta-instance-with-docker-compose)
 
 install and start the bundles in your karaf console:
 ```
-./bin/servicemix
+./bin/karaf
 > feature:repo-add mvn:io.guanaco.alerta/features/1.0.1-SNAPSHOT/xml/features
 > feature:install guanaco-alerta
 ```

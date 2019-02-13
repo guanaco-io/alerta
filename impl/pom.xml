@@ -15,6 +15,7 @@
 
     <packaging>bundle</packaging>
     <name>Guanaco :: Alerta :: Implementation</name>
+    <description>Camel routes from MQ to Alerta API</description>
 
     <properties>
         <commons-io.version>2.4</commons-io.version>
@@ -71,6 +72,15 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
         </dependency>
     </dependencies>
 

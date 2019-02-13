@@ -15,6 +15,7 @@
 
     <packaging>bundle</packaging>
     <name>Guanaco :: Alerta :: API</name>
+    <description>Alerta public API</description>
 
     <dependencies>
         <dependency>

@@ -2,11 +2,13 @@ package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.impl.AlertaImpl
+import AlertaRouteBuilderSupportTest._
+import AlertaCamelTestSupport._
 import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.impl.JndiRegistry
 import org.apache.camel.test.junit4.CamelTestSupport
-import org.apache.camel.{CamelContext, Exchange, Handler, Processor}
+import org.apache.camel._
 import org.junit.Assert._
 import org.junit.Test
 
@@ -16,9 +18,6 @@ import scala.collection.JavaConversions._
   * Test cases for [[AlertaRouteBuilderSupport]]
   */
 class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
-
-  import AlertaRouteBuilderSupportTest._
-  import AlertaCamelTestSupport._
 
   @Test
   def testSuccess(): Unit = {
@@ -120,7 +119,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertTrue(correlated.exists(_.endsWith("Failure")))
   }
 
-  override def createRouteBuilders(): Array[RouteBuilder] = Array(
+  override def createRouteBuilders(): Array[RoutesBuilder] = Array(
     createAlertaRouteBuilder(),
     new RouteBuilder() with AlertaRouteBuilderSupport {
       implicit val config = AlertaConfig(AlertaFlowId, Seq("service")) { value: String =>
