@@ -2,6 +2,7 @@ package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.impl.AlertaImpl
+import io.guanaco.alerta.test.AlertaCamelTestSupport
 import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.{CamelContext, RoutesBuilder}
 import org.apache.camel.builder.RouteBuilder

@@ -11,15 +11,20 @@
     </parent>
 
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>util_${scala.binary.version}</artifactId>
+    <artifactId>test_${scala.binary.version}</artifactId>
+    <description>Utilities for unit testing your own alerta projects</description>
 
     <packaging>jar</packaging>
-    <name>Guanaco :: Alerta :: Util</name>
+    <name>Guanaco :: Alerta :: Test</name>
 
     <dependencies>
         <dependency>
             <groupId>io.guanaco.alerta</groupId>
             <artifactId>api_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.guanaco.alerta</groupId>
+            <artifactId>impl_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -30,29 +35,20 @@
             <artifactId>camel-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.guanaco.alerta</groupId>
-            <artifactId>test_${scala.binary.version}</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-camel</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.guanaco.alerta</groupId>
-            <artifactId>impl_${scala.binary.version}</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.spray</groupId>
+            <artifactId>spray-json_${scala.binary.version}</artifactId>
         </dependency>
     </dependencies>
 
@@ -68,7 +64,7 @@
     <distributionManagement>
         <repository>
             <id>bintray-guanaco-io-alerta</id>
-            <url>https://api.bintray.com/maven/guanaco-io/alerta/util_${scala.binary.version}/;publish=1</url>
+            <url>https://api.bintray.com/maven/guanaco-io/alerta/test_${scala.binary.version}/;publish=1</url>
         </repository>
     </distributionManagement>
 

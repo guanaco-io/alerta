@@ -2,8 +2,9 @@ package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.impl.AlertaImpl
-import AlertaRouteBuilderSupportTest._
-import AlertaCamelTestSupport._
+import io.guanaco.alerta.test.AlertaCamelTestSupport
+import io.guanaco.alerta.test.AlertaCamelTestSupport._
+import io.guanaco.alerta.util.AlertaRouteBuilderSupportTest._
 import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.impl.JndiRegistry

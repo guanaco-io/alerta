@@ -31,9 +31,10 @@
 
     <modules>
         <module>api</module>
-        <module>impl</module>
         <module>util</module>
         <module>features</module>
+        <module>test</module>
+        <module>impl</module>
     </modules>
 
     <dependencyManagement>
@@ -47,6 +48,12 @@
                 <groupId>io.guanaco.alerta</groupId>
                 <artifactId>impl_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.guanaco.alerta</groupId>
+                <artifactId>test_${scala.binary.version}</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
