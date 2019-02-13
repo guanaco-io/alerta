@@ -12,8 +12,8 @@ to set up a local Alerta instance with docker-compose, follow [this guideline](h
 install and start the bundles in your karaf console:
 ```
 ./bin/servicemix
-> bundle:install mvn:io.guanaco.alerta/api/1.0.0</bundle>
-> bundle:install mvn:io.guanaco.alerta/impl/1.0.0</bundle>
+> bundle:install mvn:io.guanaco.alerta/api_2.11/1.0.1-SNAPSHOT</bundle>
+> bundle:install mvn:io.guanaco.alerta/impl_2.11/1.0.1-SNAPSHOT</bundle>
 ```
 
 add a io.guanaco.alerta.cfg file in <smx_install>/etc with your Alerta settings:
@@ -36,13 +36,13 @@ eg using maven:
 
 <dependency>
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>api</artifactId>
-    <version>1.0.0</version>
+    <artifactId>api_2.11</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
 </dependency>
 <dependency>
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>util</artifactId>
-    <version>1.0.0</version>
+    <artifactId>util_2.11</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
