@@ -3,14 +3,14 @@
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0">
 
 
-    <cm:property-placeholder persistent-id="be.guanaco.smx.alerta" update-strategy="reload">
+    <cm:property-placeholder persistent-id="io.guanaco.alerta" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="apiUrl" value="http://localhost:8282/api"/>
             <cm:property name="environment" value="Development" />
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <bean id="routes" class="be.guanaco.smx.alerta.impl.AlertaRoutes">
+    <bean id="routes" class="io.guanaco.alerta.impl.AlertaRoutes">
         <argument value="${apiUrl}"/>
         <argument value="${environment}"/>
     </bean>
@@ -25,8 +25,8 @@
         <routeBuilder ref="routes"/>
     </camelContext>
 
-    <service interface="be.guanaco.smx.alerta.api.Alerta">
-        <bean class="be.guanaco.smx.alerta.impl.AlertaImpl">
+    <service interface="io.guanaco.alerta.api.Alerta">
+        <bean class="io.guanaco.alerta.impl.AlertaImpl">
             <argument ref="alerta"/>
         </bean>
     </service>

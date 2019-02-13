@@ -12,11 +12,11 @@ to set up a local Alerta instance with docker-compose, follow [this guideline](h
 install and start the bundles in your karaf console:
 ```
 ./bin/servicemix
-> bundle:install mvn:be.guanaco.smx.alerta/api/1.0.0</bundle>
-> bundle:install mvn:be.guanaco.smx.alerta/impl/1.0.0</bundle>
+> bundle:install mvn:io.guanaco.alerta/api/1.0.0</bundle>
+> bundle:install mvn:io.guanaco.alerta/impl/1.0.0</bundle>
 ```
 
-add a be.guanaco.smx.alerta.cfg file in <smx_install>/etc with your Alerta settings:
+add a io.guanaco.alerta.cfg file in <smx_install>/etc with your Alerta settings:
 ```ini
 apiUrl = http://localhost:8282/api
 environment = Development
@@ -35,12 +35,12 @@ eg using maven:
 </repositories>
 
 <dependency>
-    <groupId>be.guanaco.smx.alerta</groupId>
+    <groupId>io.guanaco.alerta</groupId>
     <artifactId>api</artifactId>
     <version>1.0.0</version>
 </dependency>
 <dependency>
-    <groupId>be.guanaco.smx.alerta</groupId>
+    <groupId>io.guanaco.alerta</groupId>
     <artifactId>util</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -48,7 +48,7 @@ eg using maven:
 
 in your osgi config, access the Alerta service and pass it to your class sending the alert:
 ```xml
-<reference id="alerta" interface="be.guanaco.smx.alerta.Alerta"/>
+<reference id="alerta" interface="io.guanaco.alerta.Alerta"/>
 
 <bean id="yourService" class="com.example.YourService">
     <argument ref="alerta" />
@@ -63,8 +63,8 @@ to create and send an Alert from anywhere in your code, use:
 
 package com.example
 
-import be.guanaco.smx.alerta.api.Alerta
-import be.guanaco.smx.alerta.util.{AlertaConfig, AlertaSupport}
+import io.guanaco.alerta.api.Alerta
+import io.guanaco.alerta.util.{AlertaConfig, AlertaSupport}
 
 class YourService(val alerta: Alerta) extends AlertaSupport {
 
@@ -87,10 +87,10 @@ because we also send a success alert, this snippet can be repeated and previousl
 
 
 to add error handling support in your camel RouteBuilder
-for more examples see [AlertaRouteBuilderSupportTest](https://github.com/guanaco-io/alerta/blob/master/util/src/test/scala/be/guanaco/smx/alerta/util/AlertaRouteBuilderSupportTest.scala))
+for more examples see [AlertaRouteBuilderSupportTest](https://github.com/guanaco-io/alerta/blob/master/util/src/test/scala/io/guanaco/alerta/util/AlertaRouteBuilderSupportTest.scala))
 ```scala
 
-import be.guanaco.smx.alerta.util.{AlertaConfig, AlertaRouteBuilderSupport}
+import io.guanaco.alerta.util.{AlertaConfig, AlertaRouteBuilderSupport}
 
 new RouteBuilder() with AlertaRouteBuilderSupport {
   implicit val config = AlertaConfig(AlertaFlowId, Seq("service")) { value: String =>

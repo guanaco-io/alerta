@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>be.guanaco.smx</groupId>
+        <groupId>io.guanaco</groupId>
         <artifactId>alerta</artifactId>
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>be.guanaco.smx.alerta</groupId>
+    <groupId>io.guanaco.alerta</groupId>
     <artifactId>util</artifactId>
 
     <packaging>jar</packaging>
@@ -18,7 +18,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>be.guanaco.smx.alerta</groupId>
+            <groupId>io.guanaco.alerta</groupId>
             <artifactId>api</artifactId>
         </dependency>
         <dependency>
@@ -40,7 +40,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>be.guanaco.smx.alerta</groupId>
+            <groupId>io.guanaco.alerta</groupId>
             <artifactId>impl</artifactId>
             <scope>test</scope>
         </dependency>
