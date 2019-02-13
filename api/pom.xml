@@ -7,11 +7,11 @@
     <parent>
         <groupId>io.guanaco</groupId>
         <artifactId>alerta</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.x-SNAPSHOT</version>
     </parent>
 
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>api_${scala.binary.version}</artifactId>
+    <artifactId>api_2.11</artifactId>
 
     <packaging>bundle</packaging>
     <name>Guanaco :: Alerta :: API</name>
