@@ -28,6 +28,7 @@
 
     <groupId>io.guanaco.alerta</groupId>
     <artifactId>features</artifactId>
+    <version>2.0.1</version>
     <packaging>pom</packaging>
     <name>Guanaco :: Alerta :: Features</name>
 

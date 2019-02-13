@@ -11,7 +11,8 @@
     </parent>
 
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>util_${scala.binary.version}</artifactId>
+    <artifactId>util_2.12</artifactId>
+    <version>2.0.1</version>
 
     <packaging>jar</packaging>
     <name>Guanaco :: Alerta :: Util</name>

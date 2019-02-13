@@ -11,7 +11,8 @@
     </parent>
 
     <groupId>io.guanaco.alerta</groupId>
-    <artifactId>test_${scala.binary.version}</artifactId>
+    <artifactId>test_2.12</artifactId>
+    <version>2.0.1</version>
     <description>Utilities for unit testing your own alerta projects</description>
 
     <packaging>jar</packaging>
