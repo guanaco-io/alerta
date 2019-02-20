@@ -100,13 +100,16 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     val alerts = getMockEndpoint(MOCK_ALERTS)
     alerts.expectedMessageCount(1)
 
-    template.asyncSend(START, new Processor() {
-      override def process(exchange: Exchange): Unit = {
-        exchange.getIn.setBody("warning")
-        exchange.getIn.setHeader(AlertaRouteBuilderSupport.WARNING_HEADER, "Just a tiny bit messed up")
-        exchange.getIn.setHeader(AlertaRouteBuilderSupport.ATTRIBUTES_HEADER, AttributesDynamic)
+    template.asyncSend(
+      START,
+      new Processor() {
+        override def process(exchange: Exchange): Unit = {
+          exchange.getIn.setBody("warning")
+          exchange.getIn.setHeader(AlertaRouteBuilderSupport.WARNING_HEADER, "Just a tiny bit messed up")
+          exchange.getIn.setHeader(AlertaRouteBuilderSupport.ATTRIBUTES_HEADER, AttributesDynamic)
+        }
       }
-    })
+    )
 
     assertMockEndpointsSatisfied()
 
@@ -127,27 +130,29 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertTrue(correlated.exists(_.endsWith("Failure")))
   }
 
-  override def createRouteBuilders(): Array[RoutesBuilder] = Array(
-    createAlertaRouteBuilder(),
-    new RouteBuilder() with AlertaRouteBuilderSupport {
-      implicit val config = AlertaConfig(AlertaFlowId, Seq("service"), AttributesStatic) { value: String =>
-        s"${AlertaFlowId}:${value}"
-      }
+  override def createRouteBuilders(): Array[RoutesBuilder] =
+    Array(
+      createAlertaRouteBuilder(),
+      new RouteBuilder() with AlertaRouteBuilderSupport {
+        implicit val config = AlertaConfig(AlertaFlowId, Seq("service"), AttributesStatic) { value: String =>
+          s"${AlertaFlowId}:${value}"
+        }
 
-      override def configure(): Unit = {
-        configureAlerta[String]
+        override def configure(): Unit = {
+          configureAlerta[String]
 
-        //format: OFF
-        from(START)
-          .choice()
-            .when(simple("${body} contains 'broken'"))
-              .setHeader(ATTRIBUTES_HEADER, constant(AttributesDynamic))
-              .throwException(new IllegalStateException("It's broken! It really is broken!!"))
-            .otherwise()
-              .to(END)
-        //format: ON
+          // format: off
+          from(START)
+            .choice()
+              .when(simple("${body} contains 'broken'"))
+                .setHeader(ATTRIBUTES_HEADER, constant(AttributesDynamic))
+                .throwException(new IllegalStateException("It's broken! It really is broken!!"))
+              .otherwise()
+                .to(END)
+          // format: on
+        }
       }
-    })
+    )
 
   override def createCamelContext(): CamelContext = {
     val context = super.createCamelContext()
@@ -161,12 +166,12 @@ object AlertaRouteBuilderSupportTest {
 
   val START = "direct:start"
 
-  val END = "mock:end"
-  val FAILED = "mock:failed"
+  val END     = "mock:end"
+  val FAILED  = "mock:failed"
   val HANDLED = "mock:handled"
 
   val AlertaFlowId = "MyAlertaFlowId"
 
-  val AttributesStatic = Map("static" -> "attr")
-  val AttributesDynamic = Map("retry" -> "path")
+  val AttributesStatic  = Map("static" -> "attr")
+  val AttributesDynamic = Map("retry"  -> "path")
 }

@@ -34,8 +34,8 @@ class AlertaImpl(val context: CamelContext) extends Alerta {
   }
 
   /*
-     * Get or create a producer template
-     */
+   * Get or create a producer template
+   */
   private def getTemplate = {
     if (template == null) template = context.createProducerTemplate
     template

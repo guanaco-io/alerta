@@ -73,12 +73,13 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
       sendAlertaSuccess(input)
     }
 
-    def failed(input: String) = try {
-      // do something wrong
-      throw new RuntimeException("Mislukt")
-    } catch {
-      case e: Exception => sendAlertaFailure(input, e, Map("retry.path" -> "/test"))
-    }
+    def failed(input: String) =
+      try {
+        // do something wrong
+        throw new RuntimeException("Mislukt")
+      } catch {
+        case e: Exception => sendAlertaFailure(input, e, Map("retry.path" -> "/test"))
+      }
 
   }
 
@@ -87,6 +88,6 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
 object AlertaSupportTest {
 
   val MOCK_ALERTS = "mock:alerts"
-  val INPUT = "MyImportantMethodInput"
+  val INPUT       = "MyImportantMethodInput"
 
 }

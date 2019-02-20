@@ -40,9 +40,9 @@ class AlertaRoutes(val apiUrl: String, val environment: String) extends RouteBui
     def addDefaults(@Body message: String): String = {
       val alert = message.parseJson.convertTo[Alert]
       val result = alert.environment match {
-        case None => alert.withEnvironment(environment)
+        case None                          => alert.withEnvironment(environment)
         case Some(env) if env.trim.isEmpty => alert.withEnvironment(environment)
-        case _ => alert
+        case _                             => alert
       }
       result.toJson.compactPrint
     }

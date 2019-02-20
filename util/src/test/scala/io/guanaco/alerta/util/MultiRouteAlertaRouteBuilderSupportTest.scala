@@ -46,25 +46,27 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
     assertTrue(correlated.exists(_.endsWith("Failure")))
   }
 
-  override def createRouteBuilders(): Array[RoutesBuilder] = Array(
-    createAlertaRouteBuilder(),
-    new RouteBuilder() with AlertaRouteBuilderSupport {
-      implicit val config = AlertaConfig(AlertaFlowId, Seq("service")) { value: String =>
-        s"${AlertaFlowId}:${value}"
+  override def createRouteBuilders(): Array[RoutesBuilder] =
+    Array(
+      createAlertaRouteBuilder(),
+      new RouteBuilder() with AlertaRouteBuilderSupport {
+        implicit val config = AlertaConfig(AlertaFlowId, Seq("service")) { value: String =>
+          s"${AlertaFlowId}:${value}"
+        }
+
+        override def configure(): Unit = {
+
+          //format: OFF
+          from(START)
+            .configureAlerta[String]
+            .to("direct:subroute")
+
+          from("direct:subroute")
+            .to(END)
+          //format: ON
+        }
       }
-
-      override def configure(): Unit = {
-
-        //format: OFF
-        from(START)
-          .configureAlerta[String]
-          .to("direct:subroute")
-
-        from("direct:subroute")
-          .to(END)
-        //format: ON
-      }
-    })
+    )
 
   override def createCamelContext(): CamelContext = {
     val context = super.createCamelContext()
@@ -78,8 +80,8 @@ object MultiRouteAlertaRouteBuilderSupportTest {
 
   val START = "direct:start"
 
-  val END = "mock:end"
-  val FAILED = "mock:failed"
+  val END     = "mock:end"
+  val FAILED  = "mock:failed"
   val HANDLED = "mock:handled"
 
   val MOCK_ALERTS = "mock:alerts"

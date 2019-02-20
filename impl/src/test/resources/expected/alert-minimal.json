@@ -1,0 +1,10 @@
+{
+  "event": "event",
+  "service": [
+    "tag1"
+  ],
+  "resource": "resource",
+  "environment": "Production",
+  "severity": "minor",
+  "timeout": 604800
+}

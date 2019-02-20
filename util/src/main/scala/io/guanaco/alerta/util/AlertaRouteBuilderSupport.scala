@@ -46,7 +46,7 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
 
   def alerta: Alerta = getContext.getRegistry.findByType(classOf[Alerta]).asScala.toList match {
     case value :: Nil => value
-    case list => throw new IllegalStateException(s"${list.size} instances of Alerta API found - we need exactly one instance")
+    case list         => throw new IllegalStateException(s"${list.size} instances of Alerta API found - we need exactly one instance")
   }
 
   /*
@@ -64,7 +64,7 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
                exception: Exception): Unit = {
 
       val payload = Option(`override`) getOrElse body
-      val attrs = Option(attributes) getOrElse Map.empty[String, String]
+      val attrs   = Option(attributes) getOrElse Map.empty[String, String]
 
       if (exception != null) sendAlertaFailure(payload, exception, attrs)
       else if (warning != null) sendAlertaWarning(payload, warning, attrs)
@@ -76,7 +76,7 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
 
 object AlertaRouteBuilderSupport {
 
-  final val WARNING_HEADER = "AlertaWarningHeader"
+  final val WARNING_HEADER       = "AlertaWarningHeader"
   final val OVERRIDE_BODY_HEADER = "AlertaOverrideBodyHeader"
-  final val ATTRIBUTES_HEADER = "AlertaAttributesHeader"
+  final val ATTRIBUTES_HEADER    = "AlertaAttributesHeader"
 }

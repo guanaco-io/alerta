@@ -2,9 +2,6 @@ package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.api.Alerta
-import org.slf4j.LoggerFactory
-
-import scala.collection.JavaConversions._
 
 /**
   * Created by gertv on 4/26/17.
@@ -50,16 +47,12 @@ trait AlertaSupport {
       case e: ClassCastException => s"UnmappedType:${body.getClass.getSimpleName}"
     }
 
-    Logger.info(s"Created Alert ${Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes)}")
-
     Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes)
   }
 
 }
 
 object AlertaSupport {
-
-  val Logger: org.slf4j.Logger = LoggerFactory.getLogger(classOf[AlertaSupport])
 
   type Status = String
   val Failure: Status = "Failure"

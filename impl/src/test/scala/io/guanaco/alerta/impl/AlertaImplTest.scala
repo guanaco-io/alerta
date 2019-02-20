@@ -10,7 +10,7 @@ import org.junit.Test
   * Test cases for [[AlertaImpl]]
   */
 object AlertaImplTest {
-  private val MOCK_ALERTS = "mock:alerts"
+  private val MOCK_ALERTS     = "mock:alerts"
   private val MOCK_HEARTBEATS = "mock:heartbeats"
 }
 

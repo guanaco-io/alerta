@@ -10,6 +10,7 @@ import org.junit.Assert._
 import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import spray.json._
+import AbstractAlertaTest.readExpected
 
 import scala.collection.JavaConverters._
 
@@ -17,9 +18,9 @@ import scala.collection.JavaConverters._
   * Test cases for [[AlertaRoutes]]
   */
 object AlertaRoutesTest {
-  private val PORT = AvailablePortFinder.getNextAvailable(10000)
-  private val HTTP_URL = s"http://localhost:${PORT}/alerta"
-  private val MOCK_ALERTS = "mock:alerts"
+  private val PORT            = AvailablePortFinder.getNextAvailable(10000)
+  private val HTTP_URL        = s"http://localhost:${PORT}/alerta"
+  private val MOCK_ALERTS     = "mock:alerts"
   private val MOCK_HEARTBEATS = "mock:heartbeats"
 }
 
@@ -36,9 +37,11 @@ class AlertaRoutesTest extends AbstractAlertaTest {
     assertMockEndpointsSatisfied()
 
     for (exchange <- mock.getExchanges.asScala) {
-      val expected = "{\"event\":\"event\",\"service\":[\"tag1\"],\"resource\":\"resource\",\"environment\":\"Production\",\"severity\":\"minor\",\"timeout\":604800}"
 
-      JSONAssert.assertEquals(expected, exchange.getIn.getBody(classOf[String]), false)
+      val expected = readExpected("alert-minimal.json")
+      val actual   = exchange.getIn.getBody(classOf[String])
+
+      JSONAssert.assertEquals(expected, actual, false)
       assertEquals("application/json", exchange.getIn.getHeader(Exchange.CONTENT_TYPE))
     }
   }
