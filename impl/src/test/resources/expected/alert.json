@@ -1,1 +1,18 @@
-{"event":"MyEvent","text":"Very important message","service":["Service1","Service2"],"correlate":["CorrelatedEvent1","CorrelatedEvent2"],"resource":"MyResource","environment":"Production","severity":"major","timeout":604800,"value":"MyValue"}
+{
+  "event": "MyEvent",
+  "text": "Very important message",
+  "service": [
+    "Service1",
+    "Service2"
+  ],
+  "correlate": [
+    "CorrelatedEvent1",
+    "CorrelatedEvent2"
+  ],
+  "resource": "MyResource",
+  "environment": "Production",
+  "severity": "major",
+  "timeout": 604800,
+  "value": "MyValue",
+  "attributes": {"test": "value", "test2":  "value2"}
+}

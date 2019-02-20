@@ -7,7 +7,7 @@ import org.apache.camel.builder.RouteBuilder
 import org.junit.Test
 
 /**
-  * Test cases for {@link AlertaImpl}
+  * Test cases for [[AlertaImpl]]
   */
 object AlertaImplTest {
   private val MOCK_ALERTS = "mock:alerts"
@@ -20,7 +20,7 @@ class AlertaImplTest extends AbstractAlertaTest {
   def testSendAlert(): Unit = {
     getMockEndpoint(AlertaImplTest.MOCK_ALERTS).expectedMessageCount(1)
     val alerta = new AlertaImpl(context)
-    alerta.sendAlert(new Alert("resource", "event", Array()))
+    alerta.sendAlert(Alert("resource", "event", Array()))
     alerta.sendAlert(null.asInstanceOf[Alert])
     assertMockEndpointsSatisfied()
   }
@@ -36,7 +36,7 @@ class AlertaImplTest extends AbstractAlertaTest {
   }
 
   @throws[Exception]
-  override protected def createRouteBuilder = new RouteBuilder() {
+  override protected def createRouteBuilder(): RouteBuilder = new RouteBuilder() {
     @throws[Exception]
     override def configure(): Unit = {
       from(getEndpoint(Alerta.ALERT_QUEUE_NAME)).to(AlertaImplTest.MOCK_ALERTS)

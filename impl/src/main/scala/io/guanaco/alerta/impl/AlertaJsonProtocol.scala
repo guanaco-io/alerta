@@ -10,6 +10,6 @@ import spray.json.DefaultJsonProtocol
 object AlertaJsonProtocol extends DefaultJsonProtocol {
 
   implicit val heartbeatFormat = jsonFormat3(Heartbeat)
-  implicit val alertFormat = jsonFormat9(Alert)
+  implicit val alertFormat = jsonFormat10(Alert)
 
 }

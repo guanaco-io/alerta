@@ -1,9 +1,10 @@
 package io.guanaco.alerta.impl
 
 import io.guanaco.alerta.api.{Alert, Alerta}
-import AlertaImpl.getEndpoint
+import io.guanaco.alerta.impl.AlertaImpl.getEndpoint
+import io.guanaco.alerta.impl.AlertaRoutes._
 import org.apache.camel.Exchange.CONTENT_TYPE
-import org.apache.camel.{Body, Handler}
+import org.apache.camel.{Body, Handler, LoggingLevel}
 import org.apache.camel.builder.RouteBuilder
 
 /**
@@ -20,10 +21,12 @@ class AlertaRoutes(val apiUrl: String, val environment: String) extends RouteBui
     from(getEndpoint(Alerta.ALERT_QUEUE_NAME))
       .transform(method(Helper()))
       .setHeader(CONTENT_TYPE, constant("application/json"))
+      .log(LoggingLevel.DEBUG, LogName, "Sending alert to Alerta API: ${body}")
       .to(String.format("%s/alert", url))
 
     from(getEndpoint(Alerta.HEARTBEAT_QUEUE_NAME))
       .setHeader(CONTENT_TYPE, constant("application/json"))
+      .log(LoggingLevel.DEBUG, LogName, "Sending heartbeat to Alerta API: ${body}")
       .to(String.format("%s/heartbeat", url))
     //format: ON
   }
@@ -45,4 +48,9 @@ class AlertaRoutes(val apiUrl: String, val environment: String) extends RouteBui
     }
   }
 
+}
+
+object AlertaRoutes {
+
+  val LogName: String = classOf[AlertaRoutes].getName
 }

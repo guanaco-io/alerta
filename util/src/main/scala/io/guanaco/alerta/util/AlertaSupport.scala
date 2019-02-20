@@ -2,6 +2,7 @@ package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.api.Alerta
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions._
 
@@ -16,25 +17,28 @@ trait AlertaSupport {
 
   def sendAlertaSuccess[T](body: T)(implicit config: AlertaConfig[T]): Unit = {
     val alert =
-      createAlert(Success, body).withSeverity("normal")
+      createAlert(Success, body)
+        .withSeverity("normal")
 
     alerta.sendAlert(alert)
   }
 
-  def sendAlertaWarning[T](body: T, warning: String)(implicit config: AlertaConfig[T]): Unit = {
+  def sendAlertaWarning[T](body: T, warning: String, attributes: Map[String, String] = Map.empty)(implicit config: AlertaConfig[T]): Unit = {
     val alert =
       createAlert(Warning, body)
         .withSeverity("warning")
         .withText(warning)
+        .withAttributes(attributes)
 
     alerta.sendAlert(alert)
   }
 
-  def sendAlertaFailure[T](body: T, exception: Throwable)(implicit config: AlertaConfig[T]): Unit = {
+  def sendAlertaFailure[T](body: T, exception: Throwable, attributes: Map[String, String] = Map.empty)(implicit config: AlertaConfig[T]): Unit = {
     val alert =
       createAlert(Failure, body)
         .withText(exception.getMessage)
         .withValue(exception.getClass.getSimpleName)
+        .withAttributes(attributes)
 
     alerta.sendAlert(alert)
   }
@@ -46,12 +50,16 @@ trait AlertaSupport {
       case e: ClassCastException => s"UnmappedType:${body.getClass.getSimpleName}"
     }
 
-    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents))
+    Logger.info(s"Created Alert ${Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes)}")
+
+    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes)
   }
 
 }
 
 object AlertaSupport {
+
+  val Logger: org.slf4j.Logger = LoggerFactory.getLogger(classOf[AlertaSupport])
 
   type Status = String
   val Failure: Status = "Failure"

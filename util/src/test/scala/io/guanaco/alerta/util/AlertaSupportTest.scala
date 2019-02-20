@@ -34,6 +34,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
     assertEquals(s"resource.for.${INPUT}", alert.resource)
     assertEquals("BusinessServiceSuccess", alert.event)
     assertTrue(alert.correlate.get.contains("BusinessServiceFailure"))
+    assertEquals(Map("static" -> "attr"), alert.attributes)
   }
 
   @Test
@@ -50,6 +51,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
     assertEquals(s"resource.for.${INPUT}", alert.resource)
     assertEquals("BusinessServiceFailure", alert.event)
     assertTrue(alert.correlate.get.contains("BusinessServiceSuccess"))
+    assertEquals(Map("static" -> "attr", "retry.path" -> "/test"), alert.attributes)
   }
 
   override def createRouteBuilder(): RouteBuilder = createAlertaRouteBuilder()
@@ -62,7 +64,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
 
   class BusinessServices(val alerta: Alerta) extends AlertaSupport {
 
-    implicit val config = AlertaConfig("BusinessService", Seq("test", "service")) { body: String =>
+    implicit val config = AlertaConfig("BusinessService", Seq("test", "service"), Map("static" -> "attr")) { body: String =>
       s"resource.for.${body}"
     }
 
@@ -75,7 +77,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
       // do something wrong
       throw new RuntimeException("Mislukt")
     } catch {
-      case e: Exception => sendAlertaFailure(input, e)
+      case e: Exception => sendAlertaFailure(input, e, Map("retry.path" -> "/test"))
     }
 
   }

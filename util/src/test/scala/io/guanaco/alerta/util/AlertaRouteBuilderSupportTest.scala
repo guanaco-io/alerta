@@ -4,6 +4,7 @@ import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.impl.AlertaImpl
 import io.guanaco.alerta.test.AlertaCamelTestSupport
 import io.guanaco.alerta.test.AlertaCamelTestSupport._
+import io.guanaco.alerta.util.AlertaRouteBuilderSupport._
 import io.guanaco.alerta.util.AlertaRouteBuilderSupportTest._
 import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.builder.RouteBuilder
@@ -26,7 +27,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     val alerts = getMockEndpoint(MOCK_ALERTS)
     alerts.expectedMessageCount(1)
 
-    template.sendBody(START, "working")
+    template.sendBodyAndHeader(START, "working", ATTRIBUTES_HEADER, Map("test" -> "value"))
 
     assertMockEndpointsSatisfied()
 
@@ -35,6 +36,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"${AlertaFlowId}:working", alert.resource)
     assertEquals("normal", alert.severity)
+    assertEquals(AttributesStatic, alert.attributes)
   }
 
   @Test
@@ -52,6 +54,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"UnmappedType:Integer", alert.resource)
     assertEquals("normal", alert.severity)
+    assertEquals(AttributesStatic, alert.attributes)
   }
 
   @Test
@@ -70,6 +73,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"${AlertaFlowId}:working", alert.resource)
     assertEquals("normal", alert.severity)
+    assertEquals(AttributesStatic, alert.attributes)
   }
 
   @Test
@@ -88,6 +92,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertEquals("minor", alert.severity)
     assertEquals("It's broken! It really is broken!!", alert.text.get)
     assertEquals("IllegalStateException", alert.value.get)
+    assertEquals(AttributesStatic ++ AttributesDynamic, alert.attributes)
   }
 
   @Test
@@ -99,6 +104,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
       override def process(exchange: Exchange): Unit = {
         exchange.getIn.setBody("warning")
         exchange.getIn.setHeader(AlertaRouteBuilderSupport.WARNING_HEADER, "Just a tiny bit messed up")
+        exchange.getIn.setHeader(AlertaRouteBuilderSupport.ATTRIBUTES_HEADER, AttributesDynamic)
       }
     })
 
@@ -110,6 +116,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertEquals(s"${AlertaFlowId}:warning", alert.resource)
     assertEquals("warning", alert.severity)
     assertEquals("Just a tiny bit messed up", alert.text.get)
+    assertEquals(AttributesStatic ++ AttributesDynamic, alert.attributes)
   }
 
   def assertCorrelatedEvents(alert: Alert): Unit = {
@@ -123,7 +130,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
   override def createRouteBuilders(): Array[RoutesBuilder] = Array(
     createAlertaRouteBuilder(),
     new RouteBuilder() with AlertaRouteBuilderSupport {
-      implicit val config = AlertaConfig(AlertaFlowId, Seq("service")) { value: String =>
+      implicit val config = AlertaConfig(AlertaFlowId, Seq("service"), AttributesStatic) { value: String =>
         s"${AlertaFlowId}:${value}"
       }
 
@@ -134,6 +141,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
         from(START)
           .choice()
             .when(simple("${body} contains 'broken'"))
+              .setHeader(ATTRIBUTES_HEADER, constant(AttributesDynamic))
               .throwException(new IllegalStateException("It's broken! It really is broken!!"))
             .otherwise()
               .to(END)
@@ -159,4 +167,6 @@ object AlertaRouteBuilderSupportTest {
 
   val AlertaFlowId = "MyAlertaFlowId"
 
+  val AttributesStatic = Map("static" -> "attr")
+  val AttributesDynamic = Map("retry" -> "path")
 }
