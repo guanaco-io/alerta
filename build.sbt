@@ -1,45 +1,55 @@
 import sbt.KeyRanks.ATask
-import sbt.Keys.scalaVersion
 
-ThisBuild / scalaVersion     := "2.12.7"
-ThisBuild / version          := "2.0.x-SNAPSHOT"
-ThisBuild / organization     := "io.guanaco.alerta"
-ThisBuild / organizationName := "Guanaco"
+lazy val scala212 = "2.12.7"
+lazy val scala211 = "2.11.7"
+lazy val supportedScalaVersions = List(scala212, scala211)
 
+ThisBuild / scalaVersion           := scala212
+ThisBuild / version                := "2.0.2"
+ThisBuild / organization           := "io.guanaco.alerta"
+ThisBuild / organizationName       := "Guanaco"
 
 val commonSettings = Seq(
+  publishMavenStyle      := true,
+  bintrayCredentialsFile := Path.userHome / ".bintray" / ".credentials",
+  bintrayOrganization    := Some("guanaco-io"),
+  bintrayRepository      := "maven",
+  bintrayOmitLicense     := true
 )
-
-def withCommonSettings(ss : sbt.Def.SettingsDefinition*) : Seq[sbt.Def.SettingsDefinition] = {
-  commonSettings ++ ss
-}
 
 lazy val root = (project in file("."))
   .enablePlugins(ScalafmtPlugin, JavaAppPackaging, SbtOsgi)
-  .settings(withCommonSettings(
+  .settings(commonSettings)
+  .settings(
     name := "alerta",
-    libraryDependencies ++= Dependencies.tests
-  ):_*)
+    libraryDependencies ++= Dependencies.tests,
+    crossScalaVersions := Nil,
+    publish / skip := true
+  )
   .aggregate(api, features, impl, test, util)
 
 
 lazy val api = (project in file("api"))
   .enablePlugins(SbtOsgi)
-  .settings(withCommonSettings(
+  .settings(commonSettings)
+  .settings(
     name := "api",
     description := "Alerta public API",
     libraryDependencies ++= Dependencies.api,
+    crossScalaVersions := supportedScalaVersions,
     osgiSettings,
     OsgiKeys.additionalHeaders := Map(
       "Bundle-Name" -> "Guanaco :: Alerta :: API",
-    )
-  ):_*)
+    ),
+  )
 
 val packageXml = taskKey[File]("Produces an xml artifact.").withRank(ATask)
 
 lazy val features = (project in file("features"))
-  .settings(withCommonSettings(
+  .settings(commonSettings)
+  .settings(
     name := "features",
+    crossScalaVersions := supportedScalaVersions,
 
     // disable .jar publishing
     publishArtifact in (Compile, packageBin) := false,
@@ -50,14 +60,15 @@ lazy val features = (project in file("features"))
       artifact
     },
     addArtifact( Artifact("features", "features", "xml"), packageXml ).settings
-  ):_*)
+  )
 
 lazy val impl = (project in file("impl"))
   .enablePlugins(SbtOsgi)
-  .settings(withCommonSettings(
+  .settings(commonSettings)
+  .settings(
     name := "impl",
-    packageName := "Guanaco :: Alerta :: Impl",
     description := "Camel routes from MQ to Alerta API",
+    crossScalaVersions := supportedScalaVersions,
     libraryDependencies ++= Dependencies.impl,
     parallelExecution in Test := false,
     osgiSettings,
@@ -65,23 +76,27 @@ lazy val impl = (project in file("impl"))
       "Bundle-Name" -> "Guanaco :: Alerta :: Implementation",
       //"Bundle-Blueprint" -> "OSGI-INF/blueprint/alerta-blueprint.xml"
     )
-  ):_*)
+  )
   .dependsOn(api)
 
 lazy val test = (project in file("test"))
-  .settings(withCommonSettings(
+  .settings(commonSettings)
+  .settings(
     name := "test",
     description := "Utilities for unit testing your own alerta projects",
-    libraryDependencies ++= Dependencies.test
-  ):_*)
+    libraryDependencies ++= Dependencies.test,
+    crossScalaVersions := supportedScalaVersions
+  )
   .dependsOn(api, impl)
 
 lazy val util = (project in file("util"))
-  .settings(withCommonSettings(
+  .settings(commonSettings)
+  .settings(
     name := "util",
     libraryDependencies ++= Dependencies.util,
-    parallelExecution in Test := false
-  ):_*)
+    parallelExecution in Test := false,
+    crossScalaVersions := supportedScalaVersions
+  )
   .dependsOn(api, test)
 
 scalacOptions += "-feature"

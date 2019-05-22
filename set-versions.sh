@@ -26,5 +26,6 @@ cd $(dirname $0)
 BASEDIR=$(pwd)
 VERSION=$1
 
-step "Update versions in POM files to $VERSION"
-mvn -q -Pall -f $BASEDIR/pom.xml org.codehaus.mojo:versions-maven-plugin:2.2:set -DgenerateBackupPoms=false -DnewVersion=$VERSION
+step "Update versions in build.sbt to $VERSION"
+
+sed -E -i.bak 's/(version[[:space:]]*\:\=[[:space:]]*)\"(.*)\"/\1"'${VERSION}'"/g' build.sbt

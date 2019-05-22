@@ -56,9 +56,8 @@ if [ $(git branch --list $RELEASE_BRANCH) ]; then
 fi
 git checkout -b $RELEASE_BRANCH $ORIGINAL_BRANCH
 
-step "Update versions in POM files to $VERSION"
-mvn -q -Pall -f $BASEDIR/pom.xml org.codehaus.mojo:versions-maven-plugin:2.2:set -DgenerateBackupPoms=false -DnewVersion=$VERSION
-
+step "Update versions in build.sbt to $VERSION"
+sed -E -i.bak 's/(version[[:space:]]*\:\=[[:space:]]*)\"(.*)\"/\1"'${VERSION}'"/g' build.sbt
 
 step "Committing changes and creating $TAG"
 git add .
