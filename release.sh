@@ -61,7 +61,7 @@ sed -E -i.bak 's/(version[[:space:]]*\:\=[[:space:]]*)\"(.*)\"/\1"'${VERSION}'"/
 
 step "Committing changes and creating $TAG"
 git add .
-git commit -m "[release] Update POMs for release - version $VERSION"
+git commit -m "[release] Update project version for release - version $VERSION"
 git tag $TAG -m "Release $VERSION"
 
 step "Pushing tag '$TAG' to remote 'origin' and deleting release branch"
