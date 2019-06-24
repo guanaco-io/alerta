@@ -38,6 +38,8 @@ lazy val api = (project in file("api"))
     libraryDependencies ++= Dependencies.api,
     crossScalaVersions := supportedScalaVersions,
     osgiSettings,
+    OsgiKeys.exportPackage := List(OsgiKeys.bundleSymbolicName.value),
+    OsgiKeys.privatePackage := Nil,
     OsgiKeys.additionalHeaders := Map(
       "Bundle-Name" -> "Guanaco :: Alerta :: API",
     ),
@@ -55,10 +57,7 @@ lazy val features = (project in file("features"))
     publishArtifact in (Compile, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,
-    packageXml := {
-      val artifact: File = file("features/src/main/resources/features.xml")
-      artifact
-    },
+    packageXml := file("features/src/main/resources/features.xml"),
     addArtifact( Artifact("features", "features", "xml"), packageXml ).settings
   )
 
@@ -72,9 +71,10 @@ lazy val impl = (project in file("impl"))
     libraryDependencies ++= Dependencies.impl,
     parallelExecution in Test := false,
     osgiSettings,
+    OsgiKeys.importPackage := List("*", "org.apache.activemq.camel.component"),
+    OsgiKeys.privatePackage := List(s"${OsgiKeys.bundleSymbolicName.value}.*", "spray.json"),
     OsgiKeys.additionalHeaders := Map(
-      "Bundle-Name" -> "Guanaco :: Alerta :: Implementation",
-      //"Bundle-Blueprint" -> "OSGI-INF/blueprint/alerta-blueprint.xml"
+      "Bundle-Name" -> "Guanaco :: Alerta :: Implementation"
     )
   )
   .dependsOn(api)
