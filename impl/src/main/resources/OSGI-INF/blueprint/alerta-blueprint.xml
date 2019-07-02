@@ -19,9 +19,13 @@
     </bean>
 
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-        <property name="brokerURL" value="${brokerURL}"/>
-        <property name="userName" value="${userName}"/>
-        <property name="password" value="${password}"/>
+        <argument>
+            <bean class="org.apache.activemq.camel.component.ActiveMQConfiguration">
+                <property name="brokerURL" value="${brokerURL}"/>
+                <property name="username" value="${userName}"/>
+                <property name="password" value="${password}"/>
+            </bean>
+        </argument>
     </bean>
 
     <camelContext xmlns="http://camel.apache.org/schema/blueprint" id="alerta" useMDCLogging="true">
