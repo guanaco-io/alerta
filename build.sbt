@@ -1,11 +1,12 @@
 import sbt.KeyRanks.ATask
+import sbt.file
 
 lazy val scala212 = "2.12.7"
 lazy val scala211 = "2.11.7"
 lazy val supportedScalaVersions = List(scala212, scala211)
 
 ThisBuild / scalaVersion           := scala212
-ThisBuild / version                := "2.0.3-SNAPSHOT"
+ThisBuild / version                := "2.0.5-SNAPSHOT"
 ThisBuild / organization           := "io.guanaco.alerta"
 ThisBuild / organizationName       := "Guanaco"
 
@@ -46,10 +47,21 @@ lazy val api = (project in file("api"))
   )
 
 val packageXml = taskKey[File]("Produces an xml artifact.").withRank(ATask)
+val generateFeatures = taskKey[Unit]("Generates the features files.")
 
 lazy val features = (project in file("features"))
   .settings(commonSettings)
   .settings(
+    generateFeatures := {
+      streams.value.log.info("Generating features.xml files")
+      val input = (resourceDirectory in Compile).value / "features.xml"
+      val output = file("features") / "target" / "features.xml"
+      IO.write(output, IO.read(input).replaceAll("\\$\\{version\\}", version.value))
+    },
+
+    publishM2 := (publishM2 dependsOn generateFeatures).value,
+    publish := (publish dependsOn generateFeatures).value,
+
     name := "features",
     crossScalaVersions := supportedScalaVersions,
 
@@ -57,8 +69,9 @@ lazy val features = (project in file("features"))
     publishArtifact in (Compile, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,
-    packageXml := file("features/src/main/resources/features.xml"),
+    packageXml := file("features") / "target" / "features.xml",
     addArtifact( Artifact("features", "features", "xml"), packageXml ).settings
+
   )
 
 lazy val impl = (project in file("impl"))

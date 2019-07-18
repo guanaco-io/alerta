@@ -14,16 +14,16 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<features name="guanaco-alerta-2.0.3-SNAPSHOT"
+<features name="guanaco-alerta-${version}"
           xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
-    <feature name="guanaco-alerta" version="2.0.3-SNAPSHOT">
+    <feature name="guanaco-alerta" version="${version}">
         <feature version="[2.21,3)">camel-http4</feature>
         <feature version="[5.15.7,6)">activemq-camel</feature>
         <bundle dependency="true">mvn:org.scala-lang/scala-library/2.12.8</bundle>
-        <bundle>mvn:io.guanaco.alerta/api_2.12/2.0.3-SNAPSHOT</bundle>
-        <bundle>mvn:io.guanaco.alerta/impl_2.12/2.0.3-SNAPSHOT</bundle>
+        <bundle>mvn:io.guanaco.alerta/api_2.12/${version}</bundle>
+        <bundle>mvn:io.guanaco.alerta/impl_2.12/${version}</bundle>
     </feature>
 
 </features>
