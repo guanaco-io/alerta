@@ -3,7 +3,7 @@ package io.guanaco.alerta.util
 import io.guanaco.alerta.api.Alerta
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.RouteDefinition
-import org.apache.camel.{Body, Handler, Header}
+import org.apache.camel.{Body, CamelException, Exchange, Handler, Header, Processor}
 
 import scala.collection.JavaConverters._
 
@@ -26,7 +26,8 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
     def configureAlerta[T](implicit config: AlertaConfig[T]): RouteDefinition = {
       val helper = AlertaHelper(alerta)
 
-      definition.onCompletion().bean(helper).end()
+      definition.onCompletion().onFailureOnly().bean(helper, "failure").end()
+      definition.onCompletion().onCompleteOnly().bean(helper, "complete").end()
       definition
     }
 
@@ -41,7 +42,8 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
   def configureAlerta[T](implicit config: AlertaConfig[T]): Unit = {
     val helper = AlertaHelper(alerta)
 
-    onCompletion().bean(helper)
+    onCompletion().onFailureOnly().bean(helper, "failed")
+    onCompletion().onCompleteOnly().bean(helper, "complete")
   }
 
   def alerta: Alerta = getContext.getRegistry.findByType(classOf[Alerta]).asScala.toList match {
@@ -56,21 +58,36 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
 
     import AlertaRouteBuilderSupport._
 
-    @Handler
-    def handle(@Body body: T,
-               @Header(OVERRIDE_BODY_HEADER) `override`: T,
-               @Header(WARNING_HEADER) warning: String,
-               @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
-               exception: Exception): Unit = {
+    def failed(
+        @Body body: T,
+        @Header(OVERRIDE_BODY_HEADER) `override`: T,
+        @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
+        exchange: Exchange
+    ): Unit = {
+      val payload = Option(`override`) getOrElse body
+      val attrs   = Option(attributes) getOrElse Map.empty[String, String]
+      val exception = (Option(exchange.getException) orElse Option(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[Exception])) orElse Option(
+        exchange.getProperty(Exchange.EXCEPTION_HANDLED, classOf[Exception])
+      )) getOrElse {
+        new CamelException(s"Exchange ${exchange.getExchangeId} is marked as failed, but no exception is available")
+      }
 
+      sendAlertaFailure(payload, exception, attrs)
+    }
+
+    def complete(
+        @Body body: T,
+        @Header(OVERRIDE_BODY_HEADER) `override`: T,
+        @Header(WARNING_HEADER) warning: String,
+        @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
+        exchange: Exchange
+    ): Unit = {
       val payload = Option(`override`) getOrElse body
       val attrs   = Option(attributes) getOrElse Map.empty[String, String]
 
-      if (exception != null) sendAlertaFailure(payload, exception, attrs)
-      else if (warning != null) sendAlertaWarning(payload, warning, attrs)
+      if (warning != null) sendAlertaWarning(payload, warning, attrs)
       else sendAlertaSuccess(payload)
     }
-
   }
 }
 
