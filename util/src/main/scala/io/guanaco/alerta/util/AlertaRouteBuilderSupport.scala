@@ -2,7 +2,8 @@ package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alerta
 import org.apache.camel.builder.RouteBuilder
-import org.apache.camel.model.RouteDefinition
+import org.apache.camel.model.{ProcessorDefinition, RouteDefinition}
+import org.apache.camel.spi.Synchronization
 import org.apache.camel.{Body, CamelException, Exchange, Handler, Header, Processor}
 
 import scala.collection.JavaConverters._
@@ -23,14 +24,27 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
       * @param config configuration for the Alerta integration
       * @tparam T the type of the message body
       */
-    def configureAlerta[T](implicit config: AlertaConfig[T]): RouteDefinition = {
-      val helper = AlertaHelper(alerta)
+    def configureAlerta[T](implicit config: AlertaConfig[T]): ProcessorDefinition[_] = {
+      val synchronization = AlertaSynchronization(alerta)
 
-      definition.onCompletion().onFailureOnly().bean(helper, "failure").end()
-      definition.onCompletion().onCompleteOnly().bean(helper, "complete").end()
       definition
+        .process(new Processor {
+          override def process(exchange: Exchange): Unit =
+            if (!exchange.getUnitOfWork.containsSynchronization(synchronization))
+              exchange.getUnitOfWork.addSynchronization(synchronization)
+        })
     }
 
+  }
+
+  case class AlertaSynchronization[T](alerta: Alerta)(implicit config: AlertaConfig[T]) extends Synchronization {
+    val helper = AlertaHelper[T](alerta)
+
+    override def onComplete(exchange: Exchange): Unit =
+      method(helper, "complete").evaluate(exchange, classOf[Unit])
+
+    override def onFailure(exchange: Exchange): Unit =
+      method(helper, "failed").evaluate(exchange, classOf[Unit])
   }
 
   /**

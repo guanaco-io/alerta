@@ -11,15 +11,13 @@ import org.apache.camel.test.junit4.CamelTestSupport
 import org.junit.Assert._
 import org.junit.Test
 
-import scala.collection.JavaConversions._
-
 /**
   * Test cases for [[AlertaRouteBuilderSupport]] using the implicit Scala DSL to apply Alerta config to a single route
   */
 class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
 
-  import AlertaRouteBuilderSupportTest._
-  import AlertaCamelTestSupport._
+  import MultiRouteAlertaRouteBuilderSupportTest._
+  import scala.collection.JavaConverters._
 
   @Test
   def testSuccess(): Unit = {
@@ -31,11 +29,31 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
 
     assertMockEndpointsSatisfied()
 
-    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
     assertCorrelatedEvents(alert)
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"${AlertaFlowId}:working", alert.resource)
     assertEquals("normal", alert.severity)
+  }
+
+  @Test
+  def testFailure(): Unit = {
+    val alerts = getMockEndpoint(MOCK_ALERTS)
+    alerts.expectedMessageCount(1)
+
+    try {
+      template.sendBody(FAIL, "working")
+    } catch {
+      case e: Exception => //graciously ignore this
+    }
+
+    assertMockEndpointsSatisfied()
+
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
+    assertCorrelatedEvents(alert)
+    assertEquals(s"${AlertaFlowId}Failure", alert.event)
+    assertEquals(s"${AlertaFlowId}:working", alert.resource)
+    assertEquals("minor", alert.severity)
   }
 
   def assertCorrelatedEvents(alert: Alert): Unit = {
@@ -63,6 +81,10 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
 
           from("direct:subroute")
             .to(END)
+
+          from("direct:fail")
+            .configureAlerta[String]
+            .throwException(new RuntimeException("This is broken!"))
           //format: ON
         }
       }
@@ -79,6 +101,7 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
 object MultiRouteAlertaRouteBuilderSupportTest {
 
   val START = "direct:start"
+  val FAIL = "direct:fail"
 
   val END     = "mock:end"
   val FAILED  = "mock:failed"
