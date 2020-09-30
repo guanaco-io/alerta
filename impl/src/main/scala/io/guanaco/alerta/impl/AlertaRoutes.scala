@@ -4,14 +4,14 @@ import io.guanaco.alerta.api.{Alert, Alerta}
 import io.guanaco.alerta.impl.AlertaImpl.getEndpoint
 import io.guanaco.alerta.impl.AlertaRoutes._
 import org.apache.camel.Exchange.CONTENT_TYPE
-import org.apache.camel.{Body, Handler, LoggingLevel}
+import org.apache.camel.{Body, Handler, LoggingLevel, Message}
 import org.apache.camel.builder.RouteBuilder
 
 /**
   * Route to send alert/heartbeat messages from an ActiveMQ queue to Alerta using the Alerta API.
   * Cfr. http://docs.alerta.io/en/latest/api/reference.html
   */
-class AlertaRoutes(val apiUrl: String, val environment: String) extends RouteBuilder {
+class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: String) extends RouteBuilder {
 
   @throws[Exception]
   override def configure(): Unit = {
@@ -20,6 +20,7 @@ class AlertaRoutes(val apiUrl: String, val environment: String) extends RouteBui
     //format: OFF
     from(getEndpoint(Alerta.ALERT_QUEUE_NAME))
       .transform(method(Helper()))
+      .bean(Authentication())
       .setHeader(CONTENT_TYPE, constant("application/json"))
       .log(LoggingLevel.DEBUG, LogName, "Sending alert to Alerta API: ${body}")
       .to(String.format("%s/alert", url))
@@ -46,6 +47,15 @@ class AlertaRoutes(val apiUrl: String, val environment: String) extends RouteBui
       }
       result.toJson.compactPrint
     }
+  }
+
+  case class Authentication() {
+
+    @Handler
+    def addApiKey(message: Message): Unit = {
+      Option(apiKey).filterNot(_.isEmpty).map(message.setHeader("X-API-Key", _))
+    }
+
   }
 
 }
