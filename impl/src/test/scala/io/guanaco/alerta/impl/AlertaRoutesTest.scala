@@ -43,6 +43,7 @@ class AlertaRoutesTest extends AbstractAlertaTest {
 
       JSONAssert.assertEquals(expected, actual, false)
       assertEquals("application/json", exchange.getIn.getHeader(Exchange.CONTENT_TYPE))
+      assertNull(exchange.getIn.getHeader("X-API-Key"))
     }
   }
 

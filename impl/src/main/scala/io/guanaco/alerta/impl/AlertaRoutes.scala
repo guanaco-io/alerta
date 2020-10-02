@@ -3,7 +3,7 @@ package io.guanaco.alerta.impl
 import io.guanaco.alerta.api.{Alert, Alerta}
 import io.guanaco.alerta.impl.AlertaImpl.getEndpoint
 import io.guanaco.alerta.impl.AlertaRoutes._
-import org.apache.camel.Exchange.CONTENT_TYPE
+import org.apache.camel.Exchange.{CONTENT_ENCODING, CONTENT_TYPE}
 import org.apache.camel.{Body, Handler, LoggingLevel, Message}
 import org.apache.camel.builder.RouteBuilder
 
@@ -11,7 +11,11 @@ import org.apache.camel.builder.RouteBuilder
   * Route to send alert/heartbeat messages from an ActiveMQ queue to Alerta using the Alerta API.
   * Cfr. http://docs.alerta.io/en/latest/api/reference.html
   */
-class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: String) extends RouteBuilder {
+class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Option[String] = None) extends RouteBuilder {
+
+  def this(apiUrl: String, environment: String, apiKey: String) {
+    this(apiUrl, environment, Option(apiKey).filterNot(_.isEmpty))
+  }
 
   @throws[Exception]
   override def configure(): Unit = {
@@ -19,9 +23,7 @@ class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Stri
 
     //format: OFF
     from(getEndpoint(Alerta.ALERT_QUEUE_NAME))
-      .transform(method(Helper()))
-      .bean(Authentication())
-      .setHeader(CONTENT_TYPE, constant("application/json"))
+      .bean(Helper())
       .log(LoggingLevel.DEBUG, LogName, "Sending alert to Alerta API: ${body}")
       .to(String.format("%s/alert", url))
 
@@ -38,24 +40,19 @@ class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Stri
     import AlertaJsonProtocol._
 
     @Handler
-    def addDefaults(@Body message: String): String = {
-      val alert = message.parseJson.convertTo[Alert]
+    def prepareHttpRequest(message: Message): Unit = {
+      message.setHeader(CONTENT_TYPE, "application/json")
+
+      apiKey.filterNot(_.isEmpty).map(message.setHeader("X-API-Key", _))
+
+      val alert = message.getBody(classOf[String]).parseJson.convertTo[Alert]
       val result = alert.environment match {
         case None                          => alert.withEnvironment(environment)
         case Some(env) if env.trim.isEmpty => alert.withEnvironment(environment)
         case _                             => alert
       }
-      result.toJson.compactPrint
+      message.setBody(result.toJson.compactPrint)
     }
-  }
-
-  case class Authentication() {
-
-    @Handler
-    def addApiKey(message: Message): Unit = {
-      Option(apiKey).filterNot(_.isEmpty).map(message.setHeader("X-API-Key", _))
-    }
-
   }
 
 }
