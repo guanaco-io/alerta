@@ -10,12 +10,14 @@
             <cm:property name="brokerURL" value="failover:(tcp://localhost:61616)"/>
             <cm:property name="userName" value="karaf"/>
             <cm:property name="password" value="karaf"/>
+            <cm:property name="apiKey" value=""/>
         </cm:default-properties>
     </cm:property-placeholder>
 
     <bean id="routes" class="io.guanaco.alerta.impl.AlertaRoutes">
         <argument value="${apiUrl}"/>
         <argument value="${environment}"/>
+        <argument value="${apiKey}"/>
     </bean>
 
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
