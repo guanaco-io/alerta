@@ -3,8 +3,8 @@ package io.guanaco.alerta.impl
 import io.guanaco.alerta.api.{Alert, Alerta}
 import io.guanaco.alerta.impl.AlertaImpl.getEndpoint
 import io.guanaco.alerta.impl.AlertaRoutes._
-import org.apache.camel.Exchange.{CONTENT_ENCODING, CONTENT_TYPE}
-import org.apache.camel.{Body, Handler, LoggingLevel, Message}
+import org.apache.camel.Exchange.CONTENT_TYPE
+import org.apache.camel.{Handler, LoggingLevel, Message}
 import org.apache.camel.builder.RouteBuilder
 
 /**
