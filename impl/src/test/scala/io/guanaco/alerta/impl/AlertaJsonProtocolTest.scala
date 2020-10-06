@@ -35,7 +35,8 @@ class AlertaJsonProtocolTest {
         correlate = Some(Seq("CorrelatedEvent1", "CorrelatedEvent2")),
         value = Some("MyValue"),
         environment = Some("Production"),
-        attributes = Map("test" -> "value", "test2" -> "value2")
+        attributes = Map("test" -> "value", "test2" -> "value2"),
+        customer = Some("Marketing")
       )
 
     val result   = alert.toJson.compactPrint

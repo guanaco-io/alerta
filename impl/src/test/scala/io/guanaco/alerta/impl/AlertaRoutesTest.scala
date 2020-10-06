@@ -32,7 +32,7 @@ class AlertaRoutesTest extends AbstractAlertaTest {
     val mock = getMockEndpoint(AlertaRoutesTest.MOCK_ALERTS)
     mock.expectedMessageCount(1)
 
-    val alert = Alert("resource", "event", Array("tag1"))
+    val alert = Alert("resource", "event", Array("tag1"), customer = Some("Marketing"))
     sendBody(getEndpoint(Alerta.ALERT_QUEUE_NAME), alert.toJson.compactPrint)
     assertMockEndpointsSatisfied()
 
