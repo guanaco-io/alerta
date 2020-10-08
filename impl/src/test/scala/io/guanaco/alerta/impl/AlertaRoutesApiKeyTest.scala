@@ -47,7 +47,7 @@ class AlertaRoutesApiKeyTest extends AbstractAlertaTest {
 
   @throws[Exception]
   override protected def createRouteBuilders: Array[RoutesBuilder] = Array(
-    new AlertaRoutes(AlertaRoutesApiKeyTest.HTTP_URL, "Production", "apiKey"),
+    new AlertaRoutes(AlertaRoutesApiKeyTest.HTTP_URL, "Production", "apiKey", 604800),
     new RouteBuilder() {
       @throws[Exception]
       override def configure(): Unit = {

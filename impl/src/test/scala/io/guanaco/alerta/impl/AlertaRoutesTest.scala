@@ -67,7 +67,7 @@ class AlertaRoutesTest extends AbstractAlertaTest {
 
   @throws[Exception]
   override protected def createRouteBuilders: Array[RoutesBuilder] = Array(
-    new AlertaRoutes(AlertaRoutesTest.HTTP_URL, "Production"),
+    new AlertaRoutes(AlertaRoutesTest.HTTP_URL, "Production", timeout = Some(604800)),
     new RouteBuilder() {
       @throws[Exception]
       override def configure(): Unit = {
