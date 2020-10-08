@@ -35,6 +35,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
     assertEquals("BusinessServiceSuccess", alert.event)
     assertTrue(alert.correlate.get.contains("BusinessServiceFailure"))
     assertEquals(Map("static" -> "attr"), alert.attributes)
+    assertEquals(Some("Marketing"), alert.customer)
   }
 
   @Test
@@ -64,7 +65,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
 
   class BusinessServices(val alerta: Alerta) extends AlertaSupport {
 
-    implicit val config = AlertaConfig("BusinessService", Seq("test", "service"), Map("static" -> "attr")) { body: String =>
+    implicit val config = AlertaConfig("BusinessService", Seq("test", "service"), Map("static" -> "attr"), Option("Marketing")) { body: String =>
       s"resource.for.${body}"
     }
 
