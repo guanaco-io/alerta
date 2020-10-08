@@ -12,7 +12,8 @@ case class Alert(
     text: Option[String] = None,
     value: Option[String] = None,
     correlate: Option[Seq[String]] = None,
-    timeout: Long = 7 * 24 * 60 * 60 /* 7 days */,
+    //timeout: Long = 7 * 24 * 60 * 60 /* 7 days */,
+    timeout: Option[Long] = Some(7 * 24 * 60 * 60) /* 7 days */,
     attributes: Map[String, String] = Map.empty,
     customer: Option[String] = None
 ) {
@@ -28,6 +29,9 @@ case class Alert(
 
   def withEnvironment(environment: String): Alert =
     Alert(resource, event, service, Some(environment), severity, text, value, correlate, timeout, attributes, customer)
+
+  def withTimeout(timeout: Long): Alert =
+    Alert(resource, event, service, environment, severity, text, value, correlate, Some(timeout), attributes, customer)
 
   def withAttributes(attrs: Map[String, String]): Alert =
     Alert(resource, event, service, environment, severity, text, value, correlate, timeout, attributes ++ attrs, customer)
