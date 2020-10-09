@@ -12,8 +12,7 @@ case class Alert(
     text: Option[String] = None,
     value: Option[String] = None,
     correlate: Option[Seq[String]] = None,
-    //timeout: Long = 7 * 24 * 60 * 60 /* 7 days */,
-    timeout: Option[Long] = Some(7 * 24 * 60 * 60) /* 7 days */,
+    timeout: Option[Long] = None,
     attributes: Map[String, String] = Map.empty,
     customer: Option[String] = None
 ) {

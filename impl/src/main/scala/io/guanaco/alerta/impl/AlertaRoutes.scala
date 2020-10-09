@@ -45,7 +45,7 @@ class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Opti
       apiKey.filterNot(_.isEmpty).map(message.setHeader("X-API-Key", _))
 
       val alrt = message.getBody(classOf[String]).parseJson.convertTo[Alert]
-      val alert = timeout map {alrt.withTimeout(_)} getOrElse null
+      val alert = alrt.copy(timeout = alrt.timeout orElse timeout)
 
       val result = alert.environment match {
         case None                          => alert.withEnvironment(environment)
