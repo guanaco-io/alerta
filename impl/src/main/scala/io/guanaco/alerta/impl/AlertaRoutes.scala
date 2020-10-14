@@ -11,10 +11,10 @@ import org.apache.camel.builder.RouteBuilder
   * Route to send alert/heartbeat messages from an ActiveMQ queue to Alerta using the Alerta API.
   * Cfr. http://docs.alerta.io/en/latest/api/reference.html
   */
-class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Option[String] = None) extends RouteBuilder {
+class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Option[String] = None, val timeout: Option[Long] = None) extends RouteBuilder {
 
-  def this(apiUrl: String, environment: String, apiKey: String) {
-    this(apiUrl, environment, Option(apiKey).filterNot(_.isEmpty))
+  def this(apiUrl: String, environment: String, apiKey: String, timeout: Long) {
+    this(apiUrl, environment, Option(apiKey).filterNot(_.isEmpty), Option(timeout).filter(_ > 0))
   }
 
   @throws[Exception]
@@ -42,10 +42,11 @@ class AlertaRoutes(val apiUrl: String, val environment: String, val apiKey: Opti
     @Handler
     def prepareHttpRequest(message: Message): Unit = {
       message.setHeader(CONTENT_TYPE, "application/json")
-
       apiKey.filterNot(_.isEmpty).map(message.setHeader("X-API-Key", _))
 
-      val alert = message.getBody(classOf[String]).parseJson.convertTo[Alert]
+      val alrt = message.getBody(classOf[String]).parseJson.convertTo[Alert]
+      val alert = alrt.copy(timeout = alrt.timeout orElse timeout)
+
       val result = alert.environment match {
         case None                          => alert.withEnvironment(environment)
         case Some(env) if env.trim.isEmpty => alert.withEnvironment(environment)

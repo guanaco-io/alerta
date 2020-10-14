@@ -47,7 +47,7 @@ trait AlertaSupport {
       case e: ClassCastException => s"UnmappedType:${body.getClass.getSimpleName}"
     }
 
-    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes, customer = config.customer)
+    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes, customer = config.customer, timeout = config.timeout)
   }
 
 }

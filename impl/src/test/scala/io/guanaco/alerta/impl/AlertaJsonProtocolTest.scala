@@ -36,7 +36,8 @@ class AlertaJsonProtocolTest {
         value = Some("MyValue"),
         environment = Some("Production"),
         attributes = Map("test" -> "value", "test2" -> "value2"),
-        customer = Some("Marketing")
+        customer = Some("Marketing"),
+        timeout = Some(604800)
       )
 
     val result   = alert.toJson.compactPrint
