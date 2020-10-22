@@ -4,7 +4,7 @@ import io.guanaco.alerta.api.Alerta
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.{ProcessorDefinition, RouteDefinition}
 import org.apache.camel.spi.Synchronization
-import org.apache.camel.{Body, CamelException, Exchange, Handler, Header, Processor}
+import org.apache.camel.{CamelException, Exchange, Header, Processor}
 
 import scala.collection.JavaConverters._
 
@@ -29,9 +29,15 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
 
       definition
         .process(new Processor {
-          override def process(exchange: Exchange): Unit =
+          override def process(exchange: Exchange): Unit = {
             if (!exchange.getUnitOfWork.containsSynchronization(synchronization))
               exchange.getUnitOfWork.addSynchronization(synchronization)
+
+            val body: T = exchange.getIn.getBody.asInstanceOf[T]
+            if(!exchange.getProperties.containsKey("resource")) {
+              Option(body) map {value => exchange.setProperty("resource", config.resource(value))}
+            }
+          }
         })
     }
 
@@ -56,6 +62,16 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
   def configureAlerta[T](implicit config: AlertaConfig[T]): Unit = {
     val helper = AlertaHelper(alerta)
 
+    intercept()
+      .process(new Processor {
+        override def process(exchange: Exchange): Unit = {
+          val body: T = exchange.getIn.getBody.asInstanceOf[T]
+          if(!exchange.getProperties.containsKey("resource")) {
+            Option(body) map {value => exchange.setProperty("resource", config.resource(value))}
+          }
+        }
+      })
+
     onCompletion().onFailureOnly().bean(helper, "failed")
     onCompletion().onCompleteOnly().bean(helper, "complete")
   }
@@ -78,7 +94,7 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
         @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
         exchange: Exchange
     ): Unit = {
-      val payload = Option(`override`) getOrElse body
+      val payload = if(exchange.getProperty("resource") != null) Fixed(exchange.getProperty("resource").toString) else Body(body)
       val attrs   = Option(attributes) getOrElse Map.empty[String, String]
       val exception = (Option(exchange.getException) orElse Option(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[Exception])) orElse Option(
         exchange.getProperty(Exchange.EXCEPTION_HANDLED, classOf[Exception])
@@ -96,7 +112,7 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
         @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
         exchange: Exchange
     ): Unit = {
-      val payload = Option(`override`) getOrElse body
+      val payload = if(exchange.getProperty("resource") != null) Fixed(exchange.getProperty("resource").toString) else Body(body)
       val attrs   = Option(attributes) getOrElse Map.empty[String, String]
 
       if (warning != null) sendAlertaWarning(payload, warning, attrs)

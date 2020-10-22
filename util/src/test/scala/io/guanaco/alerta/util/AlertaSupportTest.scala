@@ -71,7 +71,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
 
     def succeed(input: String) = {
       // do something right
-      sendAlertaSuccess(input)
+      sendAlertaSuccess(Body(input))
     }
 
     def failed(input: String) =
@@ -79,7 +79,7 @@ class AlertaSupportTest extends CamelTestSupport with AlertaCamelTestSupport {
         // do something wrong
         throw new RuntimeException("Mislukt")
       } catch {
-        case e: Exception => sendAlertaFailure(input, e, Map("retry.path" -> "/test"))
+        case e: Exception => sendAlertaFailure(Body(input), e, Map("retry.path" -> "/test"))
       }
 
   }
