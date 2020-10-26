@@ -40,6 +40,7 @@ trait AlertaSupport {
         .withText(exception.getMessage)
         .withValue(exception.getClass.getSimpleName)
         .withAttributes(attributes)
+
     alerta.sendAlert(alert)
   }
 
@@ -56,14 +57,7 @@ trait AlertaSupport {
         case Fixed(value) => value
       }
 
-    Alert(
-      resource,
-      event(status),
-      config.services.toArray,
-      correlate = Some(allEvents),
-      attributes = config.attributes,
-      customer = config.customer,
-      timeout = config.timeout
+    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes, customer = config.customer, timeout = config.timeout
     )
   }
 
