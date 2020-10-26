@@ -1,6 +1,7 @@
 package io.guanaco.alerta.util
 
 import io.guanaco.alerta.api.Alerta
+import io.guanaco.alerta.util.AlertaRouteBuilderSupport.RESOURCE_PROPERTY
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.{ProcessorDefinition, RouteDefinition}
 import org.apache.camel.spi.Synchronization
@@ -33,9 +34,13 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
             if (!exchange.getUnitOfWork.containsSynchronization(synchronization))
               exchange.getUnitOfWork.addSynchronization(synchronization)
 
-            val body: T = exchange.getIn.getBody.asInstanceOf[T]
-            if(!exchange.getProperties.containsKey("resource")) {
-              Option(body) map {value => exchange.setProperty("resource", config.resource(value))}
+            val body = exchange.getIn.getBody
+            try {
+              if (!exchange.getProperties.containsKey(RESOURCE_PROPERTY)) {
+                Option(body) map { value => exchange.setProperty(RESOURCE_PROPERTY, config.resource(value.asInstanceOf[T])) }
+              }
+            } catch {
+              case e: ClassCastException => exchange.setProperty(RESOURCE_PROPERTY, s"UnmappedType:${body.getClass.getSimpleName}")
             }
           }
         })
@@ -65,9 +70,13 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
     intercept()
       .process(new Processor {
         override def process(exchange: Exchange): Unit = {
-          val body: T = exchange.getIn.getBody.asInstanceOf[T]
-          if(!exchange.getProperties.containsKey("resource")) {
-            Option(body) map {value => exchange.setProperty("resource", config.resource(value))}
+          val body = exchange.getIn.getBody
+          try {
+            if (!exchange.getProperties.containsKey(RESOURCE_PROPERTY)) {
+              Option(body) map { value => exchange.setProperty(RESOURCE_PROPERTY, config.resource(value.asInstanceOf[T])) }
+            }
+          } catch {
+            case e: ClassCastException => exchange.setProperty(RESOURCE_PROPERTY, s"UnmappedType:${body.getClass.getSimpleName}")
           }
         }
       })
@@ -94,7 +103,10 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
         @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
         exchange: Exchange
     ): Unit = {
-      val payload = if(exchange.getProperty("resource") != null) Fixed(exchange.getProperty("resource").toString) else Body(body)
+      val payload =  Option(exchange.getProperty(RESOURCE_PROPERTY, classOf[String])) match {
+        case None => Body(Option(`override`) getOrElse body)
+        case Some(value) => Fixed(value)
+      }
       val attrs   = Option(attributes) getOrElse Map.empty[String, String]
       val exception = (Option(exchange.getException) orElse Option(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[Exception])) orElse Option(
         exchange.getProperty(Exchange.EXCEPTION_HANDLED, classOf[Exception])
@@ -112,7 +124,12 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
         @Header(ATTRIBUTES_HEADER) attributes: Map[String, String],
         exchange: Exchange
     ): Unit = {
-      val payload = if(exchange.getProperty("resource") != null) Fixed(exchange.getProperty("resource").toString) else Body(body)
+
+      val payload =
+        Option(`override`).map(Body(_)) orElse
+        Option(exchange.getProperty(RESOURCE_PROPERTY).toString).map(Fixed(_)) getOrElse
+        Body(body)
+
       val attrs   = Option(attributes) getOrElse Map.empty[String, String]
 
       if (warning != null) sendAlertaWarning(payload, warning, attrs)
@@ -126,4 +143,5 @@ object AlertaRouteBuilderSupport {
   final val WARNING_HEADER       = "AlertaWarningHeader"
   final val OVERRIDE_BODY_HEADER = "AlertaOverrideBodyHeader"
   final val ATTRIBUTES_HEADER    = "AlertaAttributesHeader"
+  final val RESOURCE_PROPERTY    = "AlertaResourceProperty"
 }
