@@ -96,6 +96,25 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
   }
 
   @Test
+  def failureWithMultipleExceptions(): Unit = {
+    val alerts = getMockEndpoint(MOCK_ALERTS)
+    alerts.expectedMessageCount(1)
+
+    template.asyncSendBody(START, "Initial message")
+
+    assertMockEndpointsSatisfied()
+
+    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    assertCorrelatedEvents(alert)
+    assertEquals(s"${AlertaFlowId}Failure", alert.event)
+    assertEquals(s"${AlertaFlowId}:Initial message", alert.resource)
+    assertEquals("minor", alert.severity)
+    assertEquals("Initial error", alert.text.get)
+    assertEquals("IllegalStateException", alert.value.get)
+    assertEquals(AttributesStatic ++ AttributesDynamic, alert.attributes)
+  }
+
+  @Test
   def testWarning(): Unit = {
     val alerts = getMockEndpoint(MOCK_ALERTS)
     alerts.expectedMessageCount(1)
@@ -147,12 +166,33 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
               .when(simple("${body} contains 'broken'"))
                 .setHeader(ATTRIBUTES_HEADER, constant(AttributesDynamic))
                 .throwException(new IllegalStateException("It's broken! It really is broken!!"))
+
+              .when(simple("${body} contains 'Initial'"))
+                .setHeader(ATTRIBUTES_HEADER, constant(AttributesDynamic))
+                .throwException(new IllegalStateException("Initial error"))
+                .setBody(constant("Another message"))
+                .throwException(new IllegalStateException("Another error"))
+                .setBody(constant("Yet another message"))
+
               .otherwise()
                 .to(END)
           // format: on
         }
       }
     )
+
+  case class ExceptionBean() {
+    var counter = 1
+
+    @Handler
+    def throwException(): Unit = {
+      println(counter)
+      if (counter < 8) {
+        throw new IllegalStateException("Counter is sub zero!")
+      }
+      counter = counter - 1
+    }
+  }
 
   override def createCamelContext(): CamelContext = {
     val context = super.createCamelContext()
