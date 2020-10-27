@@ -5,7 +5,7 @@ import io.guanaco.alerta.util.AlertaRouteBuilderSupport.RESOURCE_PROPERTY
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.{ProcessorDefinition, RouteDefinition}
 import org.apache.camel.spi.Synchronization
-import org.apache.camel.{CamelException, Exchange, Header, Processor}
+import org.apache.camel.{CamelException, Exchange, Header, Processor, ProducerTemplate}
 
 import scala.collection.JavaConverters._
 
@@ -33,17 +33,9 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
           override def process(exchange: Exchange): Unit = {
             if (!exchange.getUnitOfWork.containsSynchronization(synchronization))
               exchange.getUnitOfWork.addSynchronization(synchronization)
-
-            val body = exchange.getIn.getBody
-            try {
-              if (!exchange.getProperties.containsKey(RESOURCE_PROPERTY)) {
-                Option(body) map { value => exchange.setProperty(RESOURCE_PROPERTY, config.resource(value.asInstanceOf[T])) }
-              }
-            } catch {
-              case e: ClassCastException => exchange.setProperty(RESOURCE_PROPERTY, s"UnmappedType:${body.getClass.getSimpleName}")
-            }
           }
         })
+        .process(ResourceProcessor(config))
     }
 
   }
@@ -68,18 +60,7 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
     val helper = AlertaHelper(alerta)
 
     intercept()
-      .process(new Processor {
-        override def process(exchange: Exchange): Unit = {
-          val body = exchange.getIn.getBody
-          try {
-            if (!exchange.getProperties.containsKey(RESOURCE_PROPERTY)) {
-              Option(body) map { value => exchange.setProperty(RESOURCE_PROPERTY, config.resource(value.asInstanceOf[T])) }
-            }
-          } catch {
-            case e: ClassCastException => exchange.setProperty(RESOURCE_PROPERTY, s"UnmappedType:${body.getClass.getSimpleName}")
-          }
-        }
-      })
+      .process(ResourceProcessor(config))
 
     onCompletion().onFailureOnly().bean(helper, "failed")
     onCompletion().onCompleteOnly().bean(helper, "complete")
@@ -136,6 +117,21 @@ trait AlertaRouteBuilderSupport { self: RouteBuilder =>
       else sendAlertaSuccess(payload)
     }
   }
+
+  case class ResourceProcessor[T](config: AlertaConfig[T]) extends Processor {
+
+    override def process(exchange: Exchange): Unit = {
+      val body = exchange.getIn.getBody
+      try {
+        if (!exchange.getProperties.containsKey(RESOURCE_PROPERTY)) {
+          Option(body) map { value => exchange.setProperty(RESOURCE_PROPERTY, config.resource(value.asInstanceOf[T])) }
+        }
+      } catch {
+        case e: ClassCastException => exchange.setProperty(RESOURCE_PROPERTY, s"UnmappedType:${body.getClass.getSimpleName}")
+      }
+    }
+  }
+
 }
 
 object AlertaRouteBuilderSupport {
