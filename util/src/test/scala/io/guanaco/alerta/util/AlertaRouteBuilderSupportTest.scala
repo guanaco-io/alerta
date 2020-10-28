@@ -109,7 +109,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     assertEquals(s"${AlertaFlowId}Failure", alert.event)
     assertEquals(s"${AlertaFlowId}:Initial message", alert.resource)
     assertEquals("minor", alert.severity)
-    assertEquals("Initial error", alert.text.get)
+    assertEquals("Counter is sub zero!", alert.text.get)
     assertEquals("IllegalStateException", alert.value.get)
     assertEquals(AttributesStatic ++ AttributesDynamic, alert.attributes)
   }
@@ -169,9 +169,9 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
               .when(simple("${body} contains 'Initial'"))
                 .setHeader(ATTRIBUTES_HEADER, constant(AttributesDynamic))
-                .throwException(new IllegalStateException("Initial error"))
+                .bean(ExceptionBean())
                 .setBody(constant("Another message"))
-                .throwException(new IllegalStateException("Another error"))
+                .bean(ExceptionBean())
                 .setBody(constant("Yet another message"))
 
               .otherwise()
@@ -186,11 +186,10 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     @Handler
     def throwException(): Unit = {
-      println(counter)
-      if (counter < 8) {
+      if (counter < 2) {
         throw new IllegalStateException("Counter is sub zero!")
       }
-      counter = counter - 1
+      counter = counter + 1
     }
   }
 
