@@ -101,6 +101,9 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
     alerts.expectedMessageCount(1)
 
     template.asyncSendBody(START, "Initial message")
+    template.asyncSendBody(START, "Initial message")
+    template.asyncSendBody(START, "Initial message")
+    template.asyncSendBody(START, "Initial message")
 
     assertMockEndpointsSatisfied()
 
@@ -173,6 +176,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
                 .setBody(constant("Another message"))
                 .bean(ExceptionBean())
                 .setBody(constant("Yet another message"))
+                .to(END)
 
               .otherwise()
                 .to(END)
@@ -186,10 +190,10 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     @Handler
     def throwException(): Unit = {
-      if (counter < 2) {
+      if (counter < 0) {
         throw new IllegalStateException("Counter is sub zero!")
       }
-      counter = counter + 1
+      counter = counter - 1
     }
   }
 
