@@ -12,7 +12,7 @@ trait AlertaSupport {
 
   val alerta: Alerta
 
-  def sendAlertaSuccess[T](body: T)(implicit config: AlertaConfig[T]): Unit = {
+  def sendAlertaSuccess[T](body: ResourceNameStrategy)(implicit config: AlertaConfig[T]): Unit = {
     val alert =
       createAlert(Success, body)
         .withSeverity("normal")
@@ -20,7 +20,9 @@ trait AlertaSupport {
     alerta.sendAlert(alert)
   }
 
-  def sendAlertaWarning[T](body: T, warning: String, attributes: Map[String, String] = Map.empty)(implicit config: AlertaConfig[T]): Unit = {
+  def sendAlertaWarning[T](body: ResourceNameStrategy, warning: String, attributes: Map[String, String] = Map.empty)(
+      implicit config: AlertaConfig[T]
+  ): Unit = {
     val alert =
       createAlert(Warning, body)
         .withSeverity("warning")
@@ -30,7 +32,9 @@ trait AlertaSupport {
     alerta.sendAlert(alert)
   }
 
-  def sendAlertaFailure[T](body: T, exception: Throwable, attributes: Map[String, String] = Map.empty)(implicit config: AlertaConfig[T]): Unit = {
+  def sendAlertaFailure[T](body: ResourceNameStrategy, exception: Throwable, attributes: Map[String, String] = Map.empty)(
+      implicit config: AlertaConfig[T]
+  ): Unit = {
     val alert =
       createAlert(Failure, body)
         .withText(exception.getMessage)
@@ -40,14 +44,21 @@ trait AlertaSupport {
     alerta.sendAlert(alert)
   }
 
-  private def createAlert[T](status: Status, body: T)(implicit config: AlertaConfig[T]): Alert = {
-    val resource = try {
-      config.resource(body)
-    } catch {
-      case e: ClassCastException => s"UnmappedType:${body.getClass.getSimpleName}"
-    }
+  private def createAlert[T](status: Status, strategy: ResourceNameStrategy)(implicit config: AlertaConfig[T]): Alert = {
+    val resource =
+      strategy match {
+        case Body(value) => {
+          try {
+            config.resource(value.asInstanceOf[T])
+          } catch {
+            case e: ClassCastException => s"UnmappedType:${value.asInstanceOf[T].getClass.getSimpleName}"
+          }
+        }
+        case Fixed(value) => value
+      }
 
-    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes, customer = config.customer, timeout = config.timeout)
+    Alert(resource, event(status), config.services.toArray, correlate = Some(allEvents), attributes = config.attributes, customer = config.customer, timeout = config.timeout
+    )
   }
 
 }
