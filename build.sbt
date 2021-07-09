@@ -36,7 +36,6 @@ lazy val api = (project in file("api"))
   .settings(commonSettings)
   .settings(
     name := "api",
-    artifactClassifier := CamelBinaryClassifier,
     description := "Alerta public API",
     libraryDependencies ++= Dependencies.api,
     crossScalaVersions := supportedScalaVersions,
@@ -76,7 +75,6 @@ lazy val impl = (project in file("impl"))
   .settings(commonSettings)
   .settings(
     name := "impl",
-    artifactClassifier := CamelBinaryClassifier,
     description := "Camel routes from MQ to Alerta API",
     crossScalaVersions := supportedScalaVersions,
     libraryDependencies ++= Dependencies.impl,
@@ -94,7 +92,6 @@ lazy val test = (project in file("test"))
   .settings(commonSettings)
   .settings(
     name := "test",
-    artifactClassifier := CamelBinaryClassifier,
     description := "Utilities for unit testing your own alerta projects",
     libraryDependencies ++= Dependencies.test,
     crossScalaVersions := supportedScalaVersions
@@ -105,7 +102,6 @@ lazy val util = (project in file("util"))
   .settings(commonSettings)
   .settings(
     name := "util",
-    artifactClassifier := CamelBinaryClassifier,
     libraryDependencies ++= Dependencies.util,
     parallelExecution in Test := false,
     crossScalaVersions := supportedScalaVersions
