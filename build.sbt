@@ -1,21 +1,21 @@
 import sbt.KeyRanks.ATask
 import sbt.file
 
-lazy val scala212 = "2.12.7"
-lazy val scala211 = "2.11.7"
-lazy val supportedScalaVersions = List(scala212, scala211)
+lazy val scala213               = "2.13.5"
+lazy val scala212               = "2.12.14"
+lazy val scala211               = "2.11.7"
+lazy val supportedScalaVersions = List(scala213, scala212, scala211)
 
-ThisBuild / scalaVersion           := scala212
-ThisBuild / version                := "2.0.7-SNAPSHOT"
-ThisBuild / organization           := "io.guanaco.alerta"
-ThisBuild / organizationName       := "Guanaco"
+ThisBuild / scalaVersion := scala212
+ThisBuild / version := "2.0.7-SNAPSHOT"
+ThisBuild / organization := "io.guanaco.alerta"
+ThisBuild / organizationName := "Guanaco"
 
 val commonSettings = Seq(
-  publishMavenStyle      := true,
-  bintrayCredentialsFile := Path.userHome / ".bintray" / ".credentials",
-  bintrayOrganization    := Some("guanaco-io"),
-  bintrayRepository      := "maven",
-  bintrayOmitLicense     := true
+  publishMavenStyle := true,
+  githubOwner := "guanaco-io",
+  githubRepository := "alerta",
+  githubTokenSource := TokenSource.Environment("GITHUB_TOKEN")
 )
 
 lazy val root = (project in file("."))
@@ -29,7 +29,6 @@ lazy val root = (project in file("."))
   )
   .aggregate(api, features, impl, test, util)
 
-
 lazy val api = (project in file("api"))
   .enablePlugins(SbtOsgi)
   .settings(commonSettings)
@@ -42,11 +41,11 @@ lazy val api = (project in file("api"))
     OsgiKeys.exportPackage := List(OsgiKeys.bundleSymbolicName.value),
     OsgiKeys.privatePackage := Nil,
     OsgiKeys.additionalHeaders := Map(
-      "Bundle-Name" -> "Guanaco :: Alerta :: API",
-    ),
+      "Bundle-Name" -> "Guanaco :: Alerta :: API"
+    )
   )
 
-val packageXml = taskKey[File]("Produces an xml artifact.").withRank(ATask)
+val packageXml       = taskKey[File]("Produces an xml artifact.").withRank(ATask)
 val generateFeatures = taskKey[Unit]("Generates the features files.")
 
 lazy val features = (project in file("features"))
@@ -54,24 +53,20 @@ lazy val features = (project in file("features"))
   .settings(
     generateFeatures := {
       streams.value.log.info("Generating features.xml files")
-      val input = (resourceDirectory in Compile).value / "features.xml"
+      val input  = (resourceDirectory in Compile).value / "features.xml"
       val output = file("features") / "target" / "features.xml"
       IO.write(output, IO.read(input).replaceAll("\\$\\{version\\}", version.value))
     },
-
     publishM2 := (publishM2 dependsOn generateFeatures).value,
     publish := (publish dependsOn generateFeatures).value,
-
     name := "features",
     crossScalaVersions := supportedScalaVersions,
-
     // disable .jar publishing
     publishArtifact in (Compile, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,
     packageXml := file("features") / "target" / "features.xml",
-    addArtifact( Artifact("features", "features", "xml"), packageXml ).settings
-
+    addArtifact(Artifact("features", "features", "xml"), packageXml).settings
   )
 
 lazy val impl = (project in file("impl"))

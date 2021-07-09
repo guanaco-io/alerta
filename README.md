@@ -29,13 +29,39 @@ password = karaf
 
 Add the guanaco-io/alerta dependency to your project.
 eg using maven:
+
+Update `~/.m2/settings.xml` and add your Github login info:
+```xml
+<settings>
+    ...
+  <servers>
+    <server>
+      <id>github</id>
+      <username>USERNAME</username>
+      <password>TOKEN</password>
+    </server>
+  </servers>
+    
+</settings>
+```
+More info about this on [Configuring Apache Maven for use with GitHub Packages
+](https://docs.github.com/en/packages/guides/configuring-apache-maven-for-use-with-github-packages#authenticating-to-github-packages)
+
+Add the repository:
+
 ```xml
 <repositories>
     <repository>
-        <id>bintray-guanaco-io-maven</id>
-        <url>https://dl.bintray.com/guanaco-io/maven/</url>
+        <id>github</id> <!-- this should equal the server id in setting.xml -->
+        <url>https://maven.pkg.github.com/guanaco-io/alerta</url>
     </repository>
 </repositories>
+```
+
+And add the dependencies:
+
+```xml
+
 
 <dependency>
     <groupId>io.guanaco.alerta</groupId>
