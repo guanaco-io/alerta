@@ -6,15 +6,14 @@ import io.guanaco.alerta.test.AlertaCamelTestSupport
 import io.guanaco.alerta.test.AlertaCamelTestSupport._
 import io.guanaco.alerta.util.AlertaRouteBuilderSupport._
 import io.guanaco.alerta.util.AlertaRouteBuilderSupportTest._
-import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.builder.RouteBuilder
-import org.apache.camel.impl.JndiRegistry
 import org.apache.camel.test.junit4.CamelTestSupport
 import org.apache.camel._
+import org.apache.camel.component.activemq.ActiveMQComponent
 import org.junit.Assert._
 import org.junit.Test
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 /**
   * Test cases for [[AlertaRouteBuilderSupport]]
@@ -31,7 +30,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     assertMockEndpointsSatisfied()
 
-    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
     assertCorrelatedEvents(alert)
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"${AlertaFlowId}:working", alert.resource)
@@ -49,7 +48,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     assertMockEndpointsSatisfied()
 
-    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
     assertCorrelatedEvents(alert)
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"UnmappedType:Integer", alert.resource)
@@ -68,7 +67,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     assertMockEndpointsSatisfied()
 
-    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
     assertCorrelatedEvents(alert)
     assertEquals(s"${AlertaFlowId}Success", alert.event)
     assertEquals(s"${AlertaFlowId}:working", alert.resource)
@@ -85,7 +84,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     assertMockEndpointsSatisfied()
 
-    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
     assertCorrelatedEvents(alert)
     assertEquals(s"${AlertaFlowId}Failure", alert.event)
     assertEquals(s"${AlertaFlowId}:broken", alert.resource)
@@ -113,7 +112,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
 
     assertMockEndpointsSatisfied()
 
-    val alert = alerts.getExchanges.head.getIn.getBody(classOf[Alert])
+    val alert = alerts.getExchanges.asScala.head.getIn.getBody(classOf[Alert])
     assertCorrelatedEvents(alert)
     assertEquals(s"${AlertaFlowId}Warning", alert.event)
     assertEquals(s"${AlertaFlowId}:warning", alert.resource)
@@ -157,7 +156,7 @@ class AlertaRouteBuilderSupportTest extends CamelTestSupport with AlertaCamelTes
   override def createCamelContext(): CamelContext = {
     val context = super.createCamelContext()
     context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://test?broker.persistent=false&broker.useJmx=false"))
-    context.getRegistry(classOf[JndiRegistry]).bind("alerta", new AlertaImpl(context))
+    context.getRegistry().bind("alerta", new AlertaImpl(context))
     context
   }
 }

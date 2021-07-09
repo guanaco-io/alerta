@@ -1,15 +1,17 @@
 import sbt.KeyRanks.ATask
 import sbt.file
 
-lazy val scala213               = "2.13.5"
+lazy val scala213               = "2.13.6"
 lazy val scala212               = "2.12.14"
-lazy val scala211               = "2.11.7"
+lazy val scala211               = "2.11.12"
 lazy val supportedScalaVersions = List(scala213, scala212, scala211)
 
-ThisBuild / scalaVersion := scala212
+ThisBuild / scalaVersion := scala213
 ThisBuild / version := "2.1.0-SNAPSHOT"
 ThisBuild / organization := "io.guanaco.alerta"
 ThisBuild / organizationName := "Guanaco"
+
+val CamelBinaryClassifier = Some(s"camel-${Dependencies.Version.camelBinary}")
 
 val commonSettings = Seq(
   publishMavenStyle := true,
@@ -60,7 +62,6 @@ lazy val features = (project in file("features"))
     publishM2 := (publishM2 dependsOn generateFeatures).value,
     publish := (publish dependsOn generateFeatures).value,
     name := "features",
-    crossScalaVersions := supportedScalaVersions,
     // disable .jar publishing
     publishArtifact in (Compile, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,

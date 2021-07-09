@@ -9,18 +9,18 @@ import spray.json._
 import io.guanaco.alerta.impl.AlertaJsonProtocol._
 import org.apache.camel.{Exchange, RoutesBuilder}
 import org.apache.camel.builder.RouteBuilder
-import org.junit.Assert.{assertEquals, assertNull}
+import org.junit.Assert.assertEquals
 import org.skyscreamer.jsonassert.JSONAssert
 
 import scala.collection.JavaConverters._
 
 /**
- * Test cases for [[AlertaRoutes]] with API Key
- */
+  * Test cases for [[AlertaRoutes]] with API Key
+  */
 object AlertaRoutesApiKeyTest {
-  private val PORT            = AvailablePortFinder.getNextAvailable(10000)
-  private val HTTP_URL        = s"http://localhost:${PORT}/alerta"
-  private val MOCK_ALERTS     = "mock:alerts"
+  private val PORT        = AvailablePortFinder.getNextAvailable()
+  private val HTTP_URL    = s"http://localhost:${PORT}/alerta"
+  private val MOCK_ALERTS = "mock:alerts"
 }
 
 class AlertaRoutesApiKeyTest extends AbstractAlertaTest {
@@ -35,9 +35,9 @@ class AlertaRoutesApiKeyTest extends AbstractAlertaTest {
     sendBody(getEndpoint(Alerta.ALERT_QUEUE_NAME), alert.toJson.compactPrint)
     assertMockEndpointsSatisfied()
 
-    for(exchange <- mock.getExchanges.asScala) {
+    for (exchange <- mock.getExchanges.asScala) {
       val expected = readExpected("alert-minimal.json")
-      val actual = exchange.getIn.getBody(classOf[String])
+      val actual   = exchange.getIn.getBody(classOf[String])
 
       JSONAssert.assertEquals(expected, actual, false)
       assertEquals("application/json", exchange.getIn.getHeader(Exchange.CONTENT_TYPE))
@@ -59,6 +59,5 @@ class AlertaRoutesApiKeyTest extends AbstractAlertaTest {
       }
     }
   )
-
 
 }
