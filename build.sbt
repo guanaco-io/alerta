@@ -1,15 +1,17 @@
 import sbt.KeyRanks.ATask
 import sbt.file
 
-lazy val scala213               = "2.13.5"
+lazy val scala213               = "2.13.6"
 lazy val scala212               = "2.12.14"
-lazy val scala211               = "2.11.7"
+lazy val scala211               = "2.11.12"
 lazy val supportedScalaVersions = List(scala213, scala212, scala211)
 
-ThisBuild / scalaVersion := scala212
+ThisBuild / scalaVersion := scala213
 ThisBuild / version := "2.1.0-SNAPSHOT"
 ThisBuild / organization := "io.guanaco.alerta"
 ThisBuild / organizationName := "Guanaco"
+
+val CamelBinaryClassifier = Some(s"camel-${Dependencies.Version.camelBinary}")
 
 val commonSettings = Seq(
   publishMavenStyle := true,
@@ -34,6 +36,7 @@ lazy val api = (project in file("api"))
   .settings(commonSettings)
   .settings(
     name := "api",
+    artifactClassifier := CamelBinaryClassifier,
     description := "Alerta public API",
     libraryDependencies ++= Dependencies.api,
     crossScalaVersions := supportedScalaVersions,
@@ -60,7 +63,6 @@ lazy val features = (project in file("features"))
     publishM2 := (publishM2 dependsOn generateFeatures).value,
     publish := (publish dependsOn generateFeatures).value,
     name := "features",
-    crossScalaVersions := supportedScalaVersions,
     // disable .jar publishing
     publishArtifact in (Compile, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,
@@ -74,6 +76,7 @@ lazy val impl = (project in file("impl"))
   .settings(commonSettings)
   .settings(
     name := "impl",
+    artifactClassifier := CamelBinaryClassifier,
     description := "Camel routes from MQ to Alerta API",
     crossScalaVersions := supportedScalaVersions,
     libraryDependencies ++= Dependencies.impl,
@@ -91,6 +94,7 @@ lazy val test = (project in file("test"))
   .settings(commonSettings)
   .settings(
     name := "test",
+    artifactClassifier := CamelBinaryClassifier,
     description := "Utilities for unit testing your own alerta projects",
     libraryDependencies ++= Dependencies.test,
     crossScalaVersions := supportedScalaVersions
@@ -101,6 +105,7 @@ lazy val util = (project in file("util"))
   .settings(commonSettings)
   .settings(
     name := "util",
+    artifactClassifier := CamelBinaryClassifier,
     libraryDependencies ++= Dependencies.util,
     parallelExecution in Test := false,
     crossScalaVersions := supportedScalaVersions

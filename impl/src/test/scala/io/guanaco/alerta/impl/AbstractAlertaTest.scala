@@ -1,7 +1,7 @@
 package io.guanaco.alerta.impl
 
-import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.CamelContext
+import org.apache.camel.component.activemq.ActiveMQComponent
 import org.apache.camel.test.junit4.CamelTestSupport
 import org.apache.commons.io.IOUtils
 

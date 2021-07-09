@@ -3,10 +3,9 @@ package io.guanaco.alerta.util
 import io.guanaco.alerta.api.Alert
 import io.guanaco.alerta.impl.AlertaImpl
 import io.guanaco.alerta.test.AlertaCamelTestSupport
-import org.apache.activemq.camel.component.ActiveMQComponent
 import org.apache.camel.{CamelContext, RoutesBuilder}
 import org.apache.camel.builder.RouteBuilder
-import org.apache.camel.impl.JndiRegistry
+import org.apache.camel.component.activemq.ActiveMQComponent
 import org.apache.camel.test.junit4.CamelTestSupport
 import org.junit.Assert._
 import org.junit.Test
@@ -93,7 +92,7 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
   override def createCamelContext(): CamelContext = {
     val context = super.createCamelContext()
     context.addComponent("activemq", ActiveMQComponent.activeMQComponent("vm://test?broker.persistent=false&broker.useJmx=false"))
-    context.getRegistry(classOf[JndiRegistry]).bind("alerta", new AlertaImpl(context))
+    context.getRegistry().bind("alerta", new AlertaImpl(context))
     context
   }
 }
@@ -101,7 +100,7 @@ class MultiRouteAlertaRouteBuilderSupportTest extends CamelTestSupport with Aler
 object MultiRouteAlertaRouteBuilderSupportTest {
 
   val START = "direct:start"
-  val FAIL = "direct:fail"
+  val FAIL  = "direct:fail"
 
   val END     = "mock:end"
   val FAILED  = "mock:failed"

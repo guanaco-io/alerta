@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
   * Test cases for [[AlertaRoutes]]
   */
 object AlertaRoutesTest {
-  private val PORT            = AvailablePortFinder.getNextAvailable(10000)
+  private val PORT            = AvailablePortFinder.getNextAvailable()
   private val HTTP_URL        = s"http://localhost:${PORT}/alerta"
   private val MOCK_ALERTS     = "mock:alerts"
   private val MOCK_HEARTBEATS = "mock:heartbeats"
